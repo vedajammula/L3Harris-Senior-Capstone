@@ -1,0 +1,4 @@
+Stocks: going back the last 10 years
+	NASDAQ: https://www.wsj.com/market-data/quotes/index/COMP/historical-prices
+	DJIA: https://www.wsj.com/market-data/quotes/index/DJIA/historical-prices
+	Russell-2000 (Optional): https://www.wsj.com/market-data/quotes/index/RUT/historical-prices
