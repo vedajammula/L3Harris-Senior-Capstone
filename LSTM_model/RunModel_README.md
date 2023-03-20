@@ -12,6 +12,7 @@ The flow structure in terms of development should be as follows:
 How to run the UI model:
   - Everything is contained in a pipenv so we should not need to locally install depencies
   - If you need to install a dependency follow this format: pipenv install "packagename"
+    - Pip env needs to be running already before you install the dependency
     - this will automatically add the dependency to the pipfile and thus to the pipenv so everyone will have it
     - please do not manually add a dependency to the pipfile because that might mess up the depdenencies for your own system and possibly others
   - To actually run the code we can do this in two steps:
