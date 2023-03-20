@@ -12,6 +12,7 @@ matplotlib = "*"
 scikit-learn = "*"
 torchvision = "*"
 seaborn = "*"
+scikit-learn-extra = "*"
 
 [dev-packages]
 
