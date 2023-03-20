@@ -3,9 +3,6 @@ import streamlit as st
 import numpy as np
 import random
 import pandas as pd 
-# from pylab import mpl, plt
-# plt.style.use('seaborn')
-# mpl.rcParams['font.family'] = 'serif'
 import matplotlib.pyplot as plt
 
 from pandas import datetime
@@ -56,26 +53,22 @@ class LSTM(nn.Module):
 
 
 
-class Runner():
+class LSTM_sim():
 
-
-    def runner(self):
-        st.write('HELLO')
+    def simulation(self):
+        st.title("L3 Harris Senior Capstone - Data Input Manipulation of LSTM Model")
         nas_df = self.get_data_timeseries()
         nas_df_filled, scaler = self.fill_missing_vals(nas_df)
+        left_col, right_col = st.columns(2)
         x_train, y_train, x_test, y_test = self.create_train_test_sets(nas_df_filled)
         self.model_run(nas_df_filled, scaler)
-
-
-
 
     def get_data_timeseries(self):
         dates = pd.date_range('2010-01-04','2017-01-03',freq='B')
         df_nas = self.get_data(dates)
         #df_nas.head()
         df_nas.fillna(method='pad')
-        st.write("We will be applyings LSTM model to the NasDaq DF")
-        st.write("Below you will see our dataset of the NasDaq close values from 2010-2017, along with a visualization")
+        st.subheader("NasDaq Data from 2010-2017, visualizing the close prices")
         left_col, right_col = st.columns(2)
         with left_col:
             st.write(df_nas)
@@ -122,12 +115,6 @@ class Runner():
     def create_train_test_sets(self, df):
         look_back = 40 # choose sequence length
         x_train, y_train, x_test, y_test = self.load_data(df, look_back)
-        st.write('Looking at the shape of the train and test sets')
-        st.write('x_train.shape = ',x_train.shape)
-        st.write('y_train.shape = ',y_train.shape)
-        st.write('x_test.shape = ',x_test.shape)
-        st.write('y_test.shape = ',y_test.shape)
-        # make training and test sets in torch
         x_train = torch.from_numpy(x_train).type(torch.Tensor)
         x_test = torch.from_numpy(x_test).type(torch.Tensor)
         y_train = torch.from_numpy(y_train).type(torch.Tensor)
@@ -141,14 +128,17 @@ class Runner():
         num_layers = 2 
         output_dim = 1
         model = LSTM(input_dim=input_dim, hidden_dim=hidden_dim, output_dim=output_dim, num_layers=num_layers)
+        left_col, right_col = st.columns(2)
 
         loss_fn = torch.nn.MSELoss()
         optimiser = torch.optim.Adam(model.parameters(), lr=0.01)
-        st.write("LSTM Model + Params:")
-        st.write(model)
-        st.write(len(list(model.parameters())))
-        for i in range(len(list(model.parameters()))):
-            st.write(list(model.parameters())[i].size())
+        with left_col:
+            st.subheader("LSTM Model + Params:")
+            st.write(model)
+            st.write(len(list(model.parameters())))
+        
+            for i in range(len(list(model.parameters()))):
+                st.write(list(model.parameters())[i].size())
         
         ##train model
         vals = self.create_train_test_sets(df)
@@ -162,32 +152,41 @@ class Runner():
 
         # Number of steps to unroll
         seq_dim =look_back-1  
-        st.write("Training Model: ")
-        for t in range(num_epochs):
-            # Initialise hidden state
-            # Don't do this if you want your LSTM to be stateful
-            #model.hidden = model.init_hidden()
-            
-            # Forward pass
-            y_train_pred = model(x_train)
+        with right_col:
+            st.subheader("Training Model: ")
+            for t in range(num_epochs):
+                # Initialise hidden state
+                # Don't do this if you want your LSTM to be stateful
+                #model.hidden = model.init_hidden()
+                
+                # Forward pass
+                y_train_pred = model(x_train)
 
-            loss = loss_fn(y_train_pred, y_train)
+                loss = loss_fn(y_train_pred, y_train)
 
-            if t % 10 == 0 and t !=0:
-                st.write("Epoch ", t, "MSE: ", loss.item())
-            hist[t] = loss.item()
+                if t % 10 == 0 and t !=0:
+                    st.write("Epoch ", t, "MSE: ", loss.item())
+                hist[t] = loss.item()
 
-            # Zero out gradient, else they will accumulate between epochs
-            optimiser.zero_grad()
+                # Zero out gradient, else they will accumulate between epochs
+                optimiser.zero_grad()
 
-            # Backward pass
-            loss.backward()
+                # Backward pass
+                loss.backward()
 
-            # Update parameters
-            optimiser.step()
+                # Update parameters
+                optimiser.step()
+
+        st.subheader('Looking at the shape of the train and test sets')
+        st.write('x_train.shape = ',x_train.shape)
+        st.write('y_train.shape = ',y_train.shape)
+        st.write('x_test.shape = ',x_test.shape)
+        st.write('y_test.shape = ',y_test.shape)
        
-        st.write("Training Loss")
+        st.subheader("Analyze Training Loss")
         st.line_chart(hist)
+
+        
 
         ##make predictions
         y_test_pred = model(x_test)
@@ -200,12 +199,13 @@ class Runner():
 
         # calculate root mean squared error
         trainScore = math.sqrt(mean_squared_error(y_train[:,0], y_train_pred[:,0]))
-        st.write('Train Score: %.2f RMSE' % (trainScore))
+        st.subheader('Train Score: %.2f RMSE' % (trainScore))
         testScore = math.sqrt(mean_squared_error(y_test[:,0], y_test_pred[:,0]))
-        st.write('Test Score: %.2f RMSE' % (testScore))
+        st.subheader('Test Score: %.2f RMSE' % (testScore))
 
         # visualize results
-        figure, axes = plt.subplots(figsize=(15, 6))
+        st.subheader("Final Results: Visualize our Predicted Stock Close Price v.s. Real Stock Close Price")
+        figure, axes = plt.subplots(figsize=(20, 15))
         axes.xaxis_date()
 
         axes.plot(df[len(df)-len(y_test):].index, y_test, color = 'red', label = 'Real NasDaq Stock Price')
@@ -217,14 +217,3 @@ class Runner():
         plt.legend()
         plt.savefig('NasDaq_pred.png')
         st.pyplot(figure)
-        #plt.show()
-
-
-
-
-
-
-        
-
-run = Runner()
-run.runner()
