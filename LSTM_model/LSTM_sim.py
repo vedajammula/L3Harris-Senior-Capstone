@@ -12,10 +12,13 @@ import datetime
 from operator import itemgetter
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import KFold
+from sklearn.model_selection import cross_val_score
 from math import sqrt
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+from cross_validate import forward_chaining_CV
 
 class LSTM(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, output_dim):
@@ -121,7 +124,9 @@ class LSTM_sim():
         y_test = torch.from_numpy(y_test).type(torch.Tensor)
 
         return [x_train, y_train, x_test, y_test]
-    
+
+
+
     def model_run(self, df, scaler):
         input_dim = 1
         hidden_dim = 32
@@ -147,6 +152,13 @@ class LSTM_sim():
         y_train =vals[1]
         x_test = vals[2]
         y_test = vals[3]
+
+        #Testing baseline here
+        model_bl = LSTM(input_dim=input_dim, hidden_dim=hidden_dim, output_dim=output_dim, num_layers=num_layers)
+        st.subheader('Looking at the baseline')
+        
+        baseline_mean = forward_chaining_CV(x_train, y_train, 10, model_bl,scaler)
+        st.subheader('Baseline Average RMSE: %.8f ' % (baseline_mean))
         num_epochs = 100
         hist = np.zeros(num_epochs)
 
