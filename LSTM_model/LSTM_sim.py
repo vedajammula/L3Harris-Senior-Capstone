@@ -125,8 +125,6 @@ class LSTM_sim():
 
         return [x_train, y_train, x_test, y_test]
 
-
-
     def model_run(self, df, scaler):
         input_dim = 1
         hidden_dim = 32
@@ -156,9 +154,18 @@ class LSTM_sim():
         #Testing baseline here
         model_bl = LSTM(input_dim=input_dim, hidden_dim=hidden_dim, output_dim=output_dim, num_layers=num_layers)
         st.subheader('Looking at the baseline')
+        #baseline_mean = forward_chaining_CV(x_train, y_train, 10, model_bl,scaler)
         
-        baseline_mean = forward_chaining_CV(x_train, y_train, 10, model_bl,scaler)
+        df_cv = [['Num folds','RMSE'],[2,0.004256599582731724],[3,0.00088069261983037],[4,0.0009792959317564964],[5,0.0007891964633017778],[6,0.0006125025684013963],[7,0.0004966917331330478],[8,0.0004152775218244642],[9,0.00039222268969751894],[10,0.00041217394755221903]]
+        for x in df_cv:
+            st.write(x[0], '            ',x[1])
+
+        baseline_mean = 0.00102607
         st.subheader('Baseline Average RMSE: %.8f ' % (baseline_mean))
+        #baseline = df_cv["RMSE"]
+        #st.subheader('Baseline Average RMSE: %.8f ' % np.mean(baseline))
+
+
         num_epochs = 100
         hist = np.zeros(num_epochs)
 

@@ -3,7 +3,7 @@ import numpy as np
 import random
 import pandas as pd 
 import matplotlib.pyplot as plt
-
+import csv
 from pandas import datetime
 import math, time
 import itertools
@@ -94,7 +94,6 @@ def forward_chaining_CV(X_train, y_train, folds, algorithm,scaler):
     ....
     Returns mean of test accuracies.
     """
-
     #print( 'Size train set: ', X_train.shape)
     
     # k is the size of each fold. It is computed dividing the number of 
@@ -160,7 +159,16 @@ def forward_chaining_CV(X_train, y_train, folds, algorithm,scaler):
         # example with i = 4:
         #      Accuracy on fold         4     :    0.85423
         st.write( 'RMSE on fold ' + str(i) + ': ', accuracies[i-2])
-    
+    """
+    with open('RMSE_CV.csv', 'w', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+        header = ['Num folds', 'RMSE']
+        # write the header
+        writer.writerow(header)
+
+        # write multiple rows
+        writer.writerows(data)
+        """
     # the function returns the mean of the accuracy on the n-1 folds    
     return accuracies.mean()
 
