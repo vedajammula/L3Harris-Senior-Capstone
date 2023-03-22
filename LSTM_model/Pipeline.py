@@ -1,9 +1,14 @@
 from LSTM_sim import LSTM_sim
+from Window import Window
 
 class Pipeline():
 
     def run_pipeline(self):
         #preprocessing steps
+        win = Window(dataframe, 20, 1)
+        for i in range(win.numberOfWindows()):
+            window, judge = win.Next()
+            #run detection on judge with window as training data window
     
         #data manipulation steps
 
