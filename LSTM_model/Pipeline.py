@@ -9,6 +9,8 @@ class Pipeline():
         for i in range(win.numberOfWindows()):
             window, judge = win.Next()
             #run detection on judge with window as training data window
+            #returns modified dataframe cleaned to be resubmitted to the window
+            win.accepted(cleaned)
     
         #data manipulation steps
 
