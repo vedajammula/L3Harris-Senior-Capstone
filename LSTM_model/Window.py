@@ -24,3 +24,6 @@ class Window():
     def accepted(dataframe):
         cols = list(self.df.columns) 
         self.df.loc[self.df.date.isin(dataframe.date), cols] = dataframe[cols].values
+
+    def cleaned():
+        return self.df
