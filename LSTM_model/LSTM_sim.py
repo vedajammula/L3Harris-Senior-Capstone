@@ -55,44 +55,49 @@ class LSTM(nn.Module):
 
 class LSTM_sim():
 
+    def __init__(self, df):
+        self.df = df
+
     def simulation(self):
         st.title("L3 Harris Senior Capstone - Data Input Manipulation of LSTM Model")
-        nas_df = self.get_data_timeseries()
-        nas_df_filled, scaler = self.fill_missing_vals(nas_df)
+
+        self.get_data_timeseries()
+        scaler = self.fill_missing_vals()
         left_col, right_col = st.columns(2)
-        x_train, y_train, x_test, y_test = self.create_train_test_sets(nas_df_filled)
-        self.model_run(nas_df_filled, scaler)
+        # x_train, y_train, x_test, y_test = self.create_train_test_sets()
+        self.model_run(scaler)
 
     def get_data_timeseries(self):
-        dates = pd.date_range('2010-01-04','2017-01-03',freq='B')
-        df_nas = self.get_data(dates)
-        #df_nas.head()
-        df_nas.fillna(method='pad')
+        # dates = pd.date_range('2010-01-04','2017-01-03',freq='B')
+        # df_nas = self.get_data(dates)
+        # #df_nas.head()
+        # df_nas.fillna(method='pad')
+
         st.subheader("NasDaq Data from 2010-2017, visualizing the close prices")
         left_col, right_col = st.columns(2)
         with left_col:
-            st.write(df_nas)
+            st.write(self.df)
         #df_nas.plot(figsize=(10, 6), subplots=True)
         with right_col:
-            st.line_chart(df_nas)
-        return df_nas
+            print('cols', self.df.columns)
+            st.line_chart(self.df)
     
-    def get_data(self, dates):
-        indices = ['djia_2012', 'nasdaq_all']
-        df = pd.DataFrame(index=dates)
-        df_temp = pd.read_csv('../stock_data/nasdaq_all.csv', index_col='Date', parse_dates=True, usecols=['Date', 'Close'], na_values=['nan'])
-        df = df.join(df_temp)
-        return df
+    # def get_data(self, dates):
+    #     indices = ['djia_2012', 'nasdaq_all']
+    #     df = pd.DataFrame(index=dates)
+    #     df_temp = pd.read_csv('../stock_data/nasdaq_all.csv', index_col='Date', parse_dates=True, usecols=['Date', 'Close'], na_values=['nan'])
+    #     df = df.join(df_temp)
+    #     return df
     
-    def fill_missing_vals(self, df):
-        df = df.fillna(method='ffill')
+    def fill_missing_vals(self):
+        self.df = self.df.fillna(method='ffill')
         scaler = MinMaxScaler(feature_range=(-1, 1))
-        df['Close'] = scaler.fit_transform(df['Close'].values.reshape(-1,1))
-        return df, scaler
+        self.df['Close'] = scaler.fit_transform(self.df['Close'].values.reshape(-1,1))
+        return scaler
     
     # function to create train, test data given stock data and sequence length
-    def load_data(self, stock, look_back):
-        data_raw = stock.values # convert to numpy array
+    def load_data(self, look_back):
+        data_raw = self.df.values # convert to numpy array
         data = []
         
         # create all possible sequences of length look_back
@@ -112,9 +117,9 @@ class LSTM_sim():
         return [x_train, y_train, x_test, y_test]
     
     
-    def create_train_test_sets(self, df):
+    def create_train_test_sets(self):
         look_back = 40 # choose sequence length
-        x_train, y_train, x_test, y_test = self.load_data(df, look_back)
+        x_train, y_train, x_test, y_test = self.load_data(look_back)
         x_train = torch.from_numpy(x_train).type(torch.Tensor)
         x_test = torch.from_numpy(x_test).type(torch.Tensor)
         y_train = torch.from_numpy(y_train).type(torch.Tensor)
@@ -122,7 +127,7 @@ class LSTM_sim():
 
         return [x_train, y_train, x_test, y_test]
     
-    def model_run(self, df, scaler):
+    def model_run(self, scaler):
         input_dim = 1
         hidden_dim = 32
         num_layers = 2 
@@ -141,7 +146,7 @@ class LSTM_sim():
                 st.write(list(model.parameters())[i].size())
         
         ##train model
-        vals = self.create_train_test_sets(df)
+        vals = self.create_train_test_sets()
         look_back = 40
         x_train = vals[0]
         y_train =vals[1]
@@ -208,8 +213,8 @@ class LSTM_sim():
         figure, axes = plt.subplots(figsize=(20, 15))
         axes.xaxis_date()
 
-        axes.plot(df[len(df)-len(y_test):].index, y_test, color = 'red', label = 'Real NasDaq Stock Price')
-        axes.plot(df[len(df)-len(y_test):].index, y_test_pred, color = 'blue', label = 'Predicted NasDaq Stock Price')
+        axes.plot(self.df[len(self.df)-len(y_test):].index, y_test, color = 'red', label = 'Real NasDaq Stock Price')
+        axes.plot(self.df[len(self.df)-len(y_test):].index, y_test_pred, color = 'blue', label = 'Predicted NasDaq Stock Price')
         #axes.xticks(np.arange(0,394,50))
         plt.title('NasDaq Stock Price Prediction')
         plt.xlabel('Time')
