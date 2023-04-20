@@ -210,7 +210,7 @@ class LSTM_sim():
 
         # visualize results
         st.subheader("Final Results: Visualize our Predicted Stock Close Price v.s. Real Stock Close Price")
-        figure, axes = plt.subplots(figsize=(20, 15))
+        figure, axes = plt.subplots(figsize=(10, 10))
         axes.xaxis_date()
 
         axes.plot(self.df[len(self.df)-len(y_test):].index, y_test, color = 'red', label = 'Real NasDaq Stock Price')

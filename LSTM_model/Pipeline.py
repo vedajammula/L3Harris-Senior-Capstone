@@ -1,6 +1,7 @@
 from LSTM_sim import LSTM_sim
 import pandas as pd
 import streamlit as st
+from Data_Manipulations.KNN_unsupervised import KNN_unsupervised 
 
 class Pipeline():
 
@@ -11,6 +12,14 @@ class Pipeline():
         st.sidebar.title("Data Manipulations")
 
         st.sidebar.header("K-Nearest Neighbors")
+        filename = 'nasdaq_all.csv'
+        start_date = '2010-01-04'
+        end_date = '2017-01-03'
+
+        k = KNN_unsupervised(filename, start_date, end_date)
+        manipulated_data = k.run_KNN()
+        print(manipulated_data)
+
 
         st.sidebar.header("Hurst Exponent")
 
