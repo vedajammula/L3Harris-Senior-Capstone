@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
 from scipy.spatial import distance
+import streamlit as st
 #source -> https://www.kaggle.com/code/morecoding/anomalydetection
 
 
@@ -17,7 +18,7 @@ class KNN_unsupervised():
     
     def process_data(self):
         #read csv file and set the dates to what we want 
-        df_temp = pd.read_csv('../../stock_data/'+self.filename, usecols=['Date', 'Close'], na_values=['nan'])
+        df_temp = pd.read_csv('../stock_data/'+self.filename, usecols=['Date', 'Close'], na_values=['nan'])
         df_temp['Date'] = pd.to_datetime(df_temp['Date'])
 
         df = df_temp[(df_temp['Date'] >= self.start_date) & (df_temp['Date'] <= self.end_date)]
@@ -41,6 +42,9 @@ class KNN_unsupervised():
         graphing_dates.pop(0)
         anomaly_score = distances[:,knn-1]
 
+        st.sidebar.text('Running KNN on ' + self.filename + ' with k neighbors=' + str(knn) )
+        st.sidebar.text('Colormap of outliers in this dataset')
+
         fig = plt.figure(figsize=(10,6))
         ax = fig.add_subplot(111)
         ax.set_title('Colormap of outliers')
@@ -49,14 +53,18 @@ class KNN_unsupervised():
         p = ax.scatter(graphing_dates ,list(delta.Close),c=anomaly_score,cmap='jet')
 
         fig.colorbar(p)
+        st.sidebar.pyplot(fig)
         plt.show()
 
         #calculate and append anomaly scores 
         anom = pd.DataFrame(anomaly_score, index=delta.index, columns=['Anomaly_Score'])
         result = pd.concat((delta,anom), axis=1)
 
-        #this is a dataframe should display to UI
         largest_anomalies = result.nlargest(5,'Anomaly_Score')
+
+        st.sidebar.text('Top 5 Largest Anomaly Scores of Data Entries')
+        with st.sidebar:
+            st.write(largest_anomalies)
         
         threshold = largest_anomalies['Anomaly_Score'].min()
         indices = (result.index[result['Anomaly_Score'] >= threshold]).tolist()
@@ -64,12 +72,14 @@ class KNN_unsupervised():
 
         for i in range(len(indices)):
             df = df.drop(indices[i])
+        
+        figure,axes = plt.subplots(figsize=(20, 15))
+        axes.plot(df.index, df['Close'])
+        axes.scatter(indices, indices_closevals, color = "r")
         plt.title(self.filename + ' data visualization ' + 'outliers')
-        plt.plot(df.index, df['Close'])
-        plt.scatter(indices, indices_closevals, color = "r")
         plt.xlabel('Time')
         plt.ylabel('Close Price')
-        plt.show()
+        st.sidebar.pyplot(figure)
 
         return df
 
