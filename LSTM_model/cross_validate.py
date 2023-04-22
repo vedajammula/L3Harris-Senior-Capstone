@@ -1,28 +1,18 @@
 import streamlit as st
 import numpy as np
-import random
-import pandas as pd 
-import matplotlib.pyplot as plt
-import csv
 from pandas import datetime
-import math, time
-import itertools
-import datetime
+import math
 from operator import itemgetter
 from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import KFold
-from sklearn.model_selection import cross_val_score
-from math import sqrt
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
 #questions:
 # What is num epochs
-# WHat is Seq_dim
+# WHat is look back and Seq_dim
 
-def performClassification(x_train, y_train, x_test, y_test, model, scaler):
+def train_and_test(x_train, y_train, x_test, y_test, model, scaler):
     ##train model
     look_back = 40
     num_epochs = 100
@@ -154,21 +144,11 @@ def forward_chaining_CV(X_train, y_train, folds, algorithm,scaler):
         y_testFolds = y[(index + 1):]
         
         # i starts from 2 so the zeroth element in accuracies array is i-2. performClassification() is a function which takes care of a classification problem. This is only an example and you can replace this function with whatever ML approach you need.
-        accuracies[i-2] = performClassification(X_trainFolds, y_trainFolds, X_testFolds, y_testFolds, algorithm,scaler)
+        accuracies[i-2] = train_and_test(X_trainFolds, y_trainFolds, X_testFolds, y_testFolds, algorithm,scaler)
         
         # example with i = 4:
         #      Accuracy on fold         4     :    0.85423
         st.write( 'RMSE on fold ' + str(i) + ': ', accuracies[i-2])
-    """
-    with open('RMSE_CV.csv', 'w', encoding='UTF8', newline='') as f:
-        writer = csv.writer(f)
-        header = ['Num folds', 'RMSE']
-        # write the header
-        writer.writerow(header)
-
-        # write multiple rows
-        writer.writerows(data)
-        """
     # the function returns the mean of the accuracy on the n-1 folds    
     return accuracies.mean()
 

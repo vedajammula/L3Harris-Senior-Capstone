@@ -19,6 +19,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from cross_validate import forward_chaining_CV
+from cross_validate import train_and_test
 
 class LSTM(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, output_dim):
@@ -79,7 +80,31 @@ class LSTM_sim():
         with right_col:
             st.line_chart(df_nas)
         return df_nas
-    
+    def get_data_covid(self):
+        dates = pd.date_range('2012-12-03','2019-12-31',freq='B')
+        df_nas = self.get_data(dates)
+        #df_nas.head()
+        df_nas.fillna(method='pad')
+        st.subheader("NasDaq Data from 2012-2019, visualizing the data before Covid-19")
+        left_col, right_col = st.columns(2)
+        with left_col:
+            st.write(df_nas)
+        #df_nas.plot(figsize=(10, 6), subplots=True)
+        with right_col:
+            st.line_chart(df_nas)
+        
+        datescovid = pd.date_range('2020-01-02','2020-12-01',freq='B')
+        df_nas_2 = self.get_data(datescovid)
+        #df_nas.head()
+        df_nas_2.fillna(method='pad')
+        st.subheader("NasDaq Data from 2020, visualizing the close prices in the first year of Covid-19")
+        left_col_2, right_col_2 = st.columns(2)
+        with left_col_2:
+            st.write(df_nas_2)
+        #df_nas.plot(figsize=(10, 6), subplots=True)
+        with right_col_2:
+            st.line_chart(df_nas_2)
+        return df_nas,df_nas_2
     def get_data(self, dates):
         indices = ['djia_2012', 'nasdaq_all']
         df = pd.DataFrame(index=dates)
@@ -113,6 +138,44 @@ class LSTM_sim():
         y_test = data[train_set_size:,-1,:]
         
         return [x_train, y_train, x_test, y_test]
+    def load_data_c_train(self, stock, look_back):
+        data_raw = stock.values # convert to numpy array
+        data = []
+        
+        # create all possible sequences of length look_back
+        for index in range(len(data_raw) - look_back): 
+            data.append(data_raw[index: index + look_back])
+        
+        data = np.array(data);
+        test_set_size = 0;
+        train_set_size = data.shape[0] - (test_set_size);
+        
+        x_train = data[:train_set_size,:-1,:]
+        y_train = data[:train_set_size,-1,:]
+        
+        x_test = data[train_set_size:,:-1]
+        y_test = data[train_set_size:,-1,:]
+        
+        return [x_train, y_train, x_test, y_test]
+    def load_data_c_test(self, stock, look_back):
+        data_raw = stock.values # convert to numpy array
+        data = []
+        
+        # create all possible sequences of length look_back
+        for index in range(len(data_raw) - look_back): 
+            data.append(data_raw[index: index + look_back])
+        
+        data = np.array(data);
+        test_set_size = data.shape[0];
+        train_set_size = 0;
+        
+        x_train = data[:train_set_size,:-1,:]
+        y_train = data[:train_set_size,-1,:]
+        
+        x_test = data[train_set_size:,:-1]
+        y_test = data[train_set_size:,-1,:]
+        
+        return [x_train, y_train, x_test, y_test]
     
     
     def create_train_test_sets(self, df):
@@ -125,6 +188,16 @@ class LSTM_sim():
 
         return [x_train, y_train, x_test, y_test]
 
+    def create_train_test_sets_c(self, df1, df2):
+        look_back = 40 # choose sequence length
+        x_train_1, y_train_1, x_test_1, y_test_1 = self.load_data_c_train(df1, look_back)
+        x_train_2, y_train_2, x_test_2, y_test_2 = self.load_data_c_test(df2, look_back)
+        x_train_1 = torch.from_numpy(x_train_1).type(torch.Tensor)
+        y_train_1 = torch.from_numpy(y_train_1).type(torch.Tensor)
+        x_test_2 = torch.from_numpy(x_test_2).type(torch.Tensor)
+        y_test_2 = torch.from_numpy(y_test_2).type(torch.Tensor)
+
+        return [x_train_1, y_train_1, x_test_2, y_test_2]
     def model_run(self, df, scaler):
         input_dim = 1
         hidden_dim = 32
@@ -222,6 +295,14 @@ class LSTM_sim():
         testScore = math.sqrt(mean_squared_error(y_test[:,0], y_test_pred[:,0]))
         st.subheader('Test Score: %.2f RMSE' % (testScore))
 
+        st.subheader("Predicting Covid: Visualize our Predicted Stock Close Price v.s. Real Stock Close Price around Covid")
+        df1c,df2c = self.get_data_covid()
+        df1 = df1c.dropna()
+        df2 = df2c.dropna()
+        x_train_covid, y_train_covid, x_test_covid, y_test_covid = self.create_train_test_sets_c(df1, df2)
+        st.write(x_train_covid, y_train_covid, x_test_covid,y_test_covid)
+        covid_error = train_and_test(x_train_covid,y_train_covid,x_test_covid,y_test_covid,model,scaler)
+        st.subheader('Test Score: %.2f RMSE' % (covid_error))
         # visualize results
         st.subheader("Final Results: Visualize our Predicted Stock Close Price v.s. Real Stock Close Price")
         figure, axes = plt.subplots(figsize=(20, 15))
