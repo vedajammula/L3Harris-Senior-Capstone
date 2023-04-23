@@ -8,7 +8,17 @@ class Pipeline():
 
     def run_pipeline(self):
         #preprocessing steps
-        win = Window(dataframe, 20, 1)
+
+        ###TEMP DATA INITIALIZIATION FOR MODEL
+        dates = pd.date_range('2010-01-04','2017-01-03',freq='B')
+        indices = ['djia_2012', 'nasdaq_all']
+        df = pd.DataFrame(index=dates)
+        df_temp = pd.read_csv('../stock_data/nasdaq_all.csv', index_col='Date', parse_dates=True, usecols=['Date', 'Close'], na_values=['nan'])
+        df = df.join(df_temp)
+        #df_nas.head()
+        df.fillna(method='pad')
+
+        win = Window(df, 20, 1)
         for i in range(win.numberOfWindows()):
             window, judge = win.Next()
             holes = detect_hole(judge)
@@ -38,15 +48,6 @@ class Pipeline():
 
         st.sidebar.header("Hole Detection")
 
-
-        ###TEMP DATA INITIALIZIATION FOR MODEL
-        dates = pd.date_range('2010-01-04','2017-01-03',freq='B')
-        indices = ['djia_2012', 'nasdaq_all']
-        df = pd.DataFrame(index=dates)
-        df_temp = pd.read_csv('../stock_data/nasdaq_all.csv', index_col='Date', parse_dates=True, usecols=['Date', 'Close'], na_values=['nan'])
-        df = df.join(df_temp)
-        #df_nas.head()
-        df.fillna(method='pad')
 
         #data manipulation steps
 
