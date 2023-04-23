@@ -3,7 +3,7 @@ import pandas
 import math
 
 class Window():
-    def __init__(self, dataframe, wSize, stepSize):
+    def __init__(self, dataframe, wSize = 20, stepSize = 1):
         self.df = dataframe
         self.wSize = wSize
         self.stepSize = stepSize

@@ -2,21 +2,44 @@ from LSTM_sim import LSTM_sim
 from Window import Window
 import pandas as pd
 import streamlit as st
+from LOF import get_LOF
+from Hurst import get_hurst_diff
 
 
 class Pipeline():
 
     def run_pipeline(self):
         #preprocessing steps
-        win = Window(dataframe, 20, 1)
+        win = Window(df, 45, 10)
+        outliers = pd.Dataframe()
+        Hursts = []
         for i in range(win.numberOfWindows()):
+            temp = pd.Dataframe()
             window, judge = win.Next()
-            holes = detect_hole(judge)
             #run detection on judge with window as training data window
+            holes = detect_hole(judge)
+            temp = temp.append(holes)
+
+            LOF = get_LOF(45, window, judge)
+            LOF = np.add(LOF, judge.first_valid_index) #LOF is now numpy list of indices of outliers
+            temp = temp.append(judgement.iloc[LOF])
+
+            color = get_hurst_diff(window, judgement)
+            Hursts.append(color)
+
+            #get temp indices and change df to nan
+            #use interpolate
+            indices = temp.index.tolist()
+            judgement.loc[indices, 'Close'] = np.nan
+            outliers = outliers.append(temp)
+            del temp
+
             #use df interpolate
+            judgement = judgement.interpolate(method='linear')
+
             #returns modified dataframe cleaned to be resubmitted to the window
             #run fill missing value on cleaned df variable
-            win.accepted(cleaned)
+            win.accepted(judgement)
     
         st.set_page_config(page_title='L3Harris Senior Capstone', page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
 
