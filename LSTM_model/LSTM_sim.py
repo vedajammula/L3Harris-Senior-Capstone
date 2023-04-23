@@ -85,7 +85,7 @@ class LSTM_sim():
         return df
     
     def fill_missing_vals(self, df):
-        df = df.fillna(method='ffill')
+        df = df.interpolate(method='linear')
         scaler = MinMaxScaler(feature_range=(-1, 1))
         df['Close'] = scaler.fit_transform(df['Close'].values.reshape(-1,1))
         return df, scaler
