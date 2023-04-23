@@ -8,6 +8,7 @@ class Pipeline():
         win = Window(dataframe, 20, 1)
         for i in range(win.numberOfWindows()):
             window, judge = win.Next()
+            holes = detect_hole(judge)
             #run detection on judge with window as training data window
             #use df interpolate
             #returns modified dataframe cleaned to be resubmitted to the window
