@@ -300,9 +300,27 @@ class LSTM_sim():
         df1 = df1c.dropna()
         df2 = df2c.dropna()
         x_train_covid, y_train_covid, x_test_covid, y_test_covid = self.create_train_test_sets_c(df1, df2)
-        st.write(x_train_covid, y_train_covid, x_test_covid,y_test_covid)
-        covid_error = train_and_test(x_train_covid,y_train_covid,x_test_covid,y_test_covid,model,scaler)
+        # st.write(x_train_covid, y_train_covid, x_test_covid,y_test_covid)
+        c_loss, covid_error, y_covid_pred,y_test_covid = train_and_test(x_train_covid,y_train_covid,x_test_covid,y_test_covid,model,scaler)
         st.subheader('Test Score: %.2f RMSE' % (covid_error))
+        # visualize results
+        st.subheader("Final Results: Visualize our Predicted Stock Close Price v.s. Real Stock Close Price for Covid")
+        figure_c, axes_c = plt.subplots(figsize=(20, 15))
+        #axes_c.xaxis_date()
+
+        axes_c.plot(df2[len(df2)-len(y_test_covid):].index, y_test_covid, color = 'red', label = 'Real NasDaq Stock Price')
+        axes_c.plot(df2[len(df2)-len(y_test_covid):].index, y_covid_pred, color = 'blue', label = 'Predicted NasDaq Stock Price')
+        #axes.xticks(np.arange(0,394,50))
+        plt.title('NasDaq Stock Price Prediction for First Year of Covid')
+        plt.xlabel('Time')
+        plt.ylabel('NasDaq Stock Price')
+        plt.legend()
+        plt.savefig('NasDaq_pred.png')
+        st.pyplot(figure_c)
+
+
+
+
         # visualize results
         st.subheader("Final Results: Visualize our Predicted Stock Close Price v.s. Real Stock Close Price")
         figure, axes = plt.subplots(figsize=(20, 15))

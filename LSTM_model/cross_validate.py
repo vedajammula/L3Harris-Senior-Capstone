@@ -68,7 +68,7 @@ def train_and_test(x_train, y_train, x_test, y_test, model, scaler):
     #st.subheader('Train Score: %.2f RMSE' % (trainScore))
     testScore = math.sqrt(mean_squared_error(y_test[:,0], y_test_pred[:,0]))
     #st.subheader('Test Score: %.2f RMSE' % (testScore))
-    return(loss.item())
+    return(loss.item(), testScore, y_test_pred,y_test)
     
 
 def forward_chaining_CV(X_train, y_train, folds, algorithm,scaler):
@@ -144,7 +144,7 @@ def forward_chaining_CV(X_train, y_train, folds, algorithm,scaler):
         y_testFolds = y[(index + 1):]
         
         # i starts from 2 so the zeroth element in accuracies array is i-2. performClassification() is a function which takes care of a classification problem. This is only an example and you can replace this function with whatever ML approach you need.
-        accuracies[i-2] = train_and_test(X_trainFolds, y_trainFolds, X_testFolds, y_testFolds, algorithm,scaler)
+        accuracies[i-2], testscore,y_test_pred, y_test = train_and_test(X_trainFolds, y_trainFolds, X_testFolds, y_testFolds, algorithm,scaler)
         
         # example with i = 4:
         #      Accuracy on fold         4     :    0.85423
