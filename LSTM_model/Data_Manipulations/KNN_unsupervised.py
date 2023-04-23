@@ -40,6 +40,7 @@ class KNN_unsupervised():
         distances, indices = nbrs.kneighbors(delta.values)
         graphing_dates = list(df.index)
         graphing_dates.pop(0)
+        #create anomaly scores from distances 
         anomaly_score = distances[:,knn-1]
 
         st.sidebar.text('Running KNN on ' + self.filename + ' with k neighbors=' + str(knn) )
@@ -60,16 +61,18 @@ class KNN_unsupervised():
         anom = pd.DataFrame(anomaly_score, index=delta.index, columns=['Anomaly_Score'])
         result = pd.concat((delta,anom), axis=1)
 
+        #display largest anomaly scores 
         largest_anomalies = result.nlargest(5,'Anomaly_Score')
 
         st.sidebar.text('Top 5 Largest Anomaly Scores of Data Entries')
         with st.sidebar:
             st.write(largest_anomalies)
         
+        #the threshold will be the lowest anomaly score values
         threshold = largest_anomalies['Anomaly_Score'].min()
         indices = (result.index[result['Anomaly_Score'] >= threshold]).tolist()
         indices_closevals = [df.loc[ind, 'Close'] for ind in indices]
-
+        #drop rows of the lowest anomaly score values
         for i in range(len(indices)):
             df = df.drop(indices[i])
         
