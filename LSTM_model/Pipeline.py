@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 from LOF import get_LOF
 from Hurst import get_hurst_diff
+from Hole_Detection import detect_hole
 
 
 class Pipeline():
@@ -11,17 +12,20 @@ class Pipeline():
     def run_pipeline(self):
         #preprocessing steps
         win = Window(df, 45, 10)
-        outliers = pd.Dataframe()
+        outliers = pd.DataFrame()
+        hole = pd.DataFrame()
         Hursts = []
         for i in range(win.numberOfWindows()):
-            temp = pd.Dataframe()
+            temp = pd.DataFrame()
             window, judge = win.Next()
             #run detection on judge with window as training data window
-            holes = detect_hole(judge)
-            temp = temp.append(holes)
+            hole = detect_hole(judge)
+            holes = holes.append(hole)
+            temp = temp.append(hole)
 
             LOF = get_LOF(45, window, judge)
             LOF = np.add(LOF, judge.first_valid_index) #LOF is now numpy list of indices of outliers
+            outliers = outliers.append(LOF)
             temp = temp.append(judgement.iloc[LOF])
 
             color = get_hurst_diff(window, judgement)
@@ -31,7 +35,6 @@ class Pipeline():
             #use interpolate
             indices = temp.index.tolist()
             judgement.loc[indices, 'Close'] = np.nan
-            outliers = outliers.append(temp)
             del temp
 
             #use df interpolate
@@ -56,10 +59,14 @@ class Pipeline():
 
 
         st.sidebar.header("Hurst Exponent")
+        print(Hursts)
+
 
         st.sidebar.header("Local Outlier Factor")
+        print(outliers)
 
         st.sidebar.header("Hole Detection")
+        print(Hursts)
 
 
         ###TEMP DATA INITIALIZIATION FOR MODEL
