@@ -2,22 +2,34 @@ from LSTM_sim import LSTM_sim
 from Window import Window
 import pandas as pd
 import streamlit as st
+import matplotlib as plt
+import numpy as np
 from LOF import get_LOF
 from Hurst import get_hurst_diff
 from Hole_Detection import detect_hole
+import math
+
 
 
 class Pipeline():
 
     def run_pipeline(self):
+        filename = 'nasdaq_all.csv'
+        start_date = '2010-01-04'
+        end_date = '2017-01-03'
+        df_temp = pd.read_csv('stock_data/'+filename, usecols=['Date', 'Close'], na_values=['nan'])
+        df_temp['Date'] = pd.to_datetime(df_temp['Date'])
+        df = df_temp[(df_temp['Date'] >= start_date) & (df_temp['Date'] <= end_date)]
+        df.set_index('Date', inplace=True)
+
         #preprocessing steps
         win = Window(df, 45, 10)
         outliers = pd.DataFrame()
-        hole = pd.DataFrame()
+        holes = pd.DataFrame()
         Hursts = []
         for i in range(win.numberOfWindows()):
             temp = pd.DataFrame()
-            window, judge = win.Next()
+            window, judge = win.nextWindow()
             #run detection on judge with window as training data window
             hole = detect_hole(judge)
             holes = holes.append(hole)
@@ -49,9 +61,7 @@ class Pipeline():
         st.sidebar.title("Data Manipulations")
 
         st.sidebar.header("K-Nearest Neighbors")
-        filename = 'nasdaq_all.csv'
-        start_date = '2010-01-04'
-        end_date = '2017-01-03'
+        
 
         k = KNN_unsupervised(filename, start_date, end_date)
         manipulated_data = k.run_KNN()
@@ -59,6 +69,19 @@ class Pipeline():
 
 
         st.sidebar.header("Hurst Exponent")
+        fig = plt.figure(figsize=(10,6))
+        ax = fig.add_subplot(111)
+        ax.set_title('Hurst-based Trend Analysis')
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Prices')
+        graphing_dates = list(df.index)
+        graphing_dates.pop(0)
+        p = ax.scatter(graphing_dates ,list(df["Close"].values.tolist()))
+        ax.axvspan(graphing_dates[0], graphing_dates[44], color='green')
+        date_sliced = graphing_dates[44:]
+        for i in len(date_sliced):
+            ax.axvspan(date_sliced[i], date_sliced[i+10], color=Hursts[math.floor(i/10)])
+            i+=10
         print(Hursts)
 
 
@@ -66,7 +89,11 @@ class Pipeline():
         print(outliers)
 
         st.sidebar.header("Hole Detection")
-        print(Hursts)
+        print(holes)
+    
+
+        fig.colorbar(p)
+        st.sidebar.pyplot(fig)
 
 
         ###TEMP DATA INITIALIZIATION FOR MODEL

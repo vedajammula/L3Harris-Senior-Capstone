@@ -1,19 +1,17 @@
-import random
+
+
+
 import numpy as np
-import csv
 import pandas as pd
 from datetime import datetime
 from datetime import date
 from datetime import timedelta
 
-class Hole_Detection:
 
-    def detect_hole(df):
-        df["Date"] = pd.to_datetime(df["Date"])
-        dataf = pd.DataFrame({'Date':df.Date,'diff':df.Date-df.Date.shift(1)})
-        dataf = dataf.drop(0)
-        dataf["Is Weekday"] = dataf['Date'].dt.dayofweek <= 4
-        temp = pd.DataFrame()
-        temp['Date'] = dataf.loc[(dataf['Is Weekday'] == False) | (((dataf['diff'] >= timedelta(days=2)) & (dataf['Date'].dt.dayofweek != 0))), 'Date']
-        return temp
-    
+def detect_hole(df):
+    df['Dates'] = pd.to_datetime(df.index)
+    dataf = pd.DataFrame({'Dates':df.Dates,'diff':df.Dates-df.Dates.shift(1)})
+    dataf["Is Weekday"] = dataf['Dates'].dt.dayofweek <= 4
+    temp = pd.DataFrame()
+    temp['Dates'] = dataf.loc[(dataf['Is Weekday'] == False) | (((dataf['diff'] >= timedelta(days=2)) & (dataf['Dates'].dt.dayofweek != 0))), 'Dates']
+    return temp
