@@ -36,23 +36,16 @@ class Pipeline():
 
         win = Window(df, 45, 10)
         outliers = pd.DataFrame()
-<<<<<<< HEAD
-=======
         holes = pd.DataFrame()
->>>>>>> aadde19ce75d50133f1992e17944c90b106158ae
         Hursts = []
         for i in range(win.numberOfWindows()):
             temp = pd.DataFrame()
             window, judge = win.nextWindow()
             #run detection on judge with window as training data window
-<<<<<<< HEAD
-            holes = Hole_Detection.detect_hole(judge)
             temp = temp.append(holes)
-=======
-            hole = detect_hole(judge)
+            hole = Hole_Detection.detect_hole(judge)
             holes = holes.append(hole)
             temp = temp.append(hole)
->>>>>>> aadde19ce75d50133f1992e17944c90b106158ae
 
             LOF = get_LOF(45, window, judge)
             LOF = np.add(LOF, judge.first_valid_index) #LOF is now numpy list of indices of outliers
