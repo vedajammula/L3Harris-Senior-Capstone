@@ -18,8 +18,7 @@ from math import sqrt
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from cross_validate import forward_chaining_CV
-from cross_validate import train_and_test
+from Data_Manipulations.Cross_Validate import forward_chaining_CV, train_and_test
 
 class LSTM(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, output_dim):

@@ -12,12 +12,12 @@ class Window():
         #database, window size, and step size and index
     
     def numberOfWindows(self):
-        return math.ceil((self.size-wSize) / self.stepSize)
+        return math.ceil((self.wSize) / self.stepSize)
 
     def nextWindow(self):
         limit = self.index + self.wSize + self.stepSize if self.index + self.wSize + self.stepSize <= self.size else self.size
-        win = self.df.iloc[self.index : self.index + wSize]
-        judge = self.df.iloc[self.index + wSize : limit]
+        win = self.df.iloc[self.index : self.index + self.wSize]
+        judge = self.df.iloc[self.index + self.wSize : limit]
         self.index = self.index + self.stepSize
         return (win, judge)
 

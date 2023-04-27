@@ -1,16 +1,18 @@
 from LSTM_sim import LSTM_sim
 from Window import Window
 import pandas as pd
+import numpy as np
 import streamlit as st
-from LOF import get_LOF
-from Hurst import get_hurst_diff
+from Data_Manipulations.LOF import get_LOF
+from Data_Manipulations.Hurst import get_hurst_diff
+from Data_Manipulations import KNN_unsupervised
+from Data_Manipulations.Hole_Detection import Hole_Detection
 
 
 class Pipeline():
 
     def run_pipeline(self):
         #preprocessing steps
-<<<<<<< HEAD
 
         ###TEMP DATA INITIALIZIATION FOR MODEL
         dates = pd.date_range('2010-01-04','2017-01-03',freq='B')
@@ -21,17 +23,14 @@ class Pipeline():
         #df_nas.head()
         df.fillna(method='pad')
 
-        win = Window(df, 20, 1)
-=======
         win = Window(df, 45, 10)
-        outliers = pd.Dataframe()
+        outliers = pd.DataFrame()
         Hursts = []
->>>>>>> 1c28f0749d6f0f21aeb42785c2e2f85d5e3537cc
         for i in range(win.numberOfWindows()):
-            temp = pd.Dataframe()
-            window, judge = win.Next()
+            temp = pd.DataFrame()
+            window, judge = win.nextWindow()
             #run detection on judge with window as training data window
-            holes = detect_hole(judge)
+            holes = Hole_Detection.detect_hole(judge)
             temp = temp.append(holes)
 
             LOF = get_LOF(45, window, judge)
@@ -64,7 +63,7 @@ class Pipeline():
         start_date = '2010-01-04'
         end_date = '2017-01-03'
 
-        k = KNN_unsupervised(filename, start_date, end_date)
+        k = KNN_unsupervised.KNN_unsupervised(filename, start_date, end_date)
         manipulated_data = k.run_KNN()
         print(manipulated_data)
 
@@ -76,18 +75,6 @@ class Pipeline():
         st.sidebar.header("Hole Detection")
 
 
-<<<<<<< HEAD
-=======
-        ###TEMP DATA INITIALIZIATION FOR MODEL
-        # dates = pd.date_range('2010-01-04','2017-01-03',freq='B')
-        # indices = ['djia_2012', 'nasdaq_all']
-        # df = pd.DataFrame(index=dates)
-        # df_temp = pd.read_csv('../stock_data/nasdaq_all.csv', index_col='Date', parse_dates=True, usecols=['Date', 'Close'], na_values=['nan'])
-        # df = df.join(df_temp)
-        # #df_nas.head()
-        # df.fillna(method='pad')
-
->>>>>>> 1c28f0749d6f0f21aeb42785c2e2f85d5e3537cc
         #data manipulation steps
 
         #LSTM Model
