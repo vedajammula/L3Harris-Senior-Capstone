@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-def get_hurst_exponent(time_series, max_lag=30):
+def get_hurst_exponent(time_series, max_lag=45):
     lags = range(2, max_lag)
 
     # variances of the lagged differences
