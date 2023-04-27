@@ -1,12 +1,12 @@
 from LSTM_sim import LSTM_sim
-from Window import Window
+from Data_Manipulations.Window import Window
 import pandas as pd
 import numpy as np
 import streamlit as st
 from Data_Manipulations.LOF import get_LOF
 from Data_Manipulations.Hurst import get_hurst_diff
 from Data_Manipulations import KNN_unsupervised
-from Data_Manipulations.Hole_Detection import Hole_Detection
+from Data_Manipulations.Hole_Detection import detect_hole
 import matplotlib as plt
 import math
 
@@ -43,7 +43,7 @@ class Pipeline():
             window, judge = win.nextWindow()
             #run detection on judge with window as training data window
             temp = temp.append(holes)
-            hole = Hole_Detection.detect_hole(judge)
+            hole = detect_hole(judge)
             holes = holes.append(hole)
             temp = temp.append(hole)
 

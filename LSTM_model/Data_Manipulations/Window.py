@@ -12,11 +12,7 @@ class Window():
         #database, window size, and step size and index
     
     def numberOfWindows(self):
-<<<<<<< HEAD:LSTM_model/Data_Manipulations/Window.py
-        return math.ceil((self.wSize) / self.stepSize)
-=======
         return math.ceil((self.size-self.wSize) / self.stepSize)
->>>>>>> aadde19ce75d50133f1992e17944c90b106158ae:LSTM_model/Window.py
 
     def nextWindow(self):
         limit = self.index + self.wSize + self.stepSize if self.index + self.wSize + self.stepSize <= self.size else self.size
