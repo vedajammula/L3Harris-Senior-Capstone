@@ -55,7 +55,7 @@ class KNN_unsupervised():
 
         fig.colorbar(p)
         st.sidebar.pyplot(fig)
-        plt.show()
+
 
         #calculate and append anomaly scores 
         anom = pd.DataFrame(anomaly_score, index=delta.index, columns=['Anomaly_Score'])

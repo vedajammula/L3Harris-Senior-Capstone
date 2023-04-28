@@ -81,31 +81,37 @@ class Pipeline():
 
 
         st.sidebar.header("Hurst Exponent")
-        fig = plt.figure(figsize=(10,6))
+        fig = plt.figure(figsize=(20,15))
         ax = fig.add_subplot(111)
         ax.set_title('Hurst-based Trend Analysis')
         ax.set_xlabel('Time')
         ax.set_ylabel('Prices')
         graphing_dates = list(df.index)
-        graphing_dates.pop(0)
-        p = ax.scatter(graphing_dates ,list(df["Close"].values.tolist()))
-        ax.axvspan(graphing_dates[0], graphing_dates[44], color='green')
+        print(graphing_dates[0])
+        p = ax.scatter(df.index,df["Close"], zorder=4)
+        ax.axvspan(graphing_dates[0], graphing_dates[44], alpha=0.3,color='green',zorder=3)
         date_sliced = graphing_dates[44:]
-        for i in len(date_sliced):
-            ax.axvspan(date_sliced[i], date_sliced[i+10], color=Hursts[math.floor(i/10)])
-            i+=10
+        for i in range(len(date_sliced)):
+            endDate = i+10 if i+10<len(date_sliced) else len(date_sliced)-1
+            ax.axvspan(date_sliced[i], endDate, alpha=0.3,color=Hursts[math.floor(i/10)],zorder=3)
+            i = endDate
+        st.sidebar.pyplot(fig)
+        fig.colorbar(p)
         print(Hursts)
 
 
         st.sidebar.header("Local Outlier Factor")
+        st.sidebar
+        st.sidebar.write(outliers)
         print(outliers)
 
         st.sidebar.header("Hole Detection")
+        st.sidebar.write(holes)
         print(holes)
     
 
-        fig.colorbar(p)
-        st.sidebar.pyplot(fig)
+        
+        
 
 
         #data manipulation steps
