@@ -1,12 +1,13 @@
 from LSTM_sim import LSTM_sim
-from Window import Window
+from Data_Manipulations.Window import Window
 import pandas as pd
-import streamlit as st
-import matplotlib as plt
 import numpy as np
-from LOF import get_LOF
-from Hurst import get_hurst_diff
-from Hole_Detection import detect_hole
+import streamlit as st
+from Data_Manipulations.LOF import get_LOF
+from Data_Manipulations.Hurst import get_hurst_diff
+from Data_Manipulations import KNN_unsupervised
+from Data_Manipulations.Hole_Detection import detect_hole
+import matplotlib as plt
 import math
 
 
@@ -23,6 +24,16 @@ class Pipeline():
         df.set_index('Date', inplace=True)
 
         #preprocessing steps
+
+        ###TEMP DATA INITIALIZIATION FOR MODEL
+        dates = pd.date_range('2010-01-04','2017-01-03',freq='B')
+        indices = ['djia_2012', 'nasdaq_all']
+        df = pd.DataFrame(index=dates)
+        df_temp = pd.read_csv('../stock_data/nasdaq_all.csv', index_col='Date', parse_dates=True, usecols=['Date', 'Close'], na_values=['nan'])
+        df = df.join(df_temp)
+        #df_nas.head()
+        df.fillna(method='pad')
+
         win = Window(df, 45, 10)
         outliers = pd.DataFrame()
         holes = pd.DataFrame()
@@ -31,6 +42,7 @@ class Pipeline():
             temp = pd.DataFrame()
             window, judge = win.nextWindow()
             #run detection on judge with window as training data window
+            temp = temp.append(holes)
             hole = detect_hole(judge)
             holes = holes.append(hole)
             temp = temp.append(hole)
@@ -63,7 +75,7 @@ class Pipeline():
         st.sidebar.header("K-Nearest Neighbors")
         
 
-        k = KNN_unsupervised(filename, start_date, end_date)
+        k = KNN_unsupervised.KNN_unsupervised(filename, start_date, end_date)
         manipulated_data = k.run_KNN()
         print(manipulated_data)
 
@@ -95,15 +107,6 @@ class Pipeline():
         fig.colorbar(p)
         st.sidebar.pyplot(fig)
 
-
-        ###TEMP DATA INITIALIZIATION FOR MODEL
-        # dates = pd.date_range('2010-01-04','2017-01-03',freq='B')
-        # indices = ['djia_2012', 'nasdaq_all']
-        # df = pd.DataFrame(index=dates)
-        # df_temp = pd.read_csv('../stock_data/nasdaq_all.csv', index_col='Date', parse_dates=True, usecols=['Date', 'Close'], na_values=['nan'])
-        # df = df.join(df_temp)
-        # #df_nas.head()
-        # df.fillna(method='pad')
 
         #data manipulation steps
 

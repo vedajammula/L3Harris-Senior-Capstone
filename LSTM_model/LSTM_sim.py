@@ -12,14 +12,10 @@ import datetime
 from operator import itemgetter
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import KFold
-from sklearn.model_selection import cross_val_score
 from math import sqrt
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from cross_validate import forward_chaining_CV
-from cross_validate import train_and_test
 
 class LSTM(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, output_dim):
@@ -68,7 +64,6 @@ class LSTM_sim():
         self.get_data_timeseries()
         scaler = self.fill_missing_vals()
         left_col, right_col = st.columns(2)
-        # x_train, y_train, x_test, y_test = self.create_train_test_sets()
         self.model_run(scaler)
 
     def get_data_timeseries(self):
@@ -81,44 +76,12 @@ class LSTM_sim():
         left_col, right_col = st.columns(2)
         with left_col:
             st.write(self.df)
-        #df_nas.plot(figsize=(10, 6), subplots=True)
         with right_col:
             print('cols', self.df.columns)
             st.line_chart(self.df)
-    def get_data_covid(self):
-        dates = pd.date_range('2012-12-03','2019-12-31',freq='B')
-        df_nas = self.get_data(dates)
-        #df_nas.head()
-        df_nas.fillna(method='pad')
-        st.subheader("NasDaq Data from 2012-2019, visualizing the data before Covid-19")
-        left_col, right_col = st.columns(2)
-        with left_col:
-            st.write(df_nas)
-        #df_nas.plot(figsize=(10, 6), subplots=True)
-        with right_col:
-            st.line_chart(df_nas)
-        
-        datescovid = pd.date_range('2020-01-02','2020-12-01',freq='B')
-        df_nas_2 = self.get_data(datescovid)
-        #df_nas.head()
-        df_nas_2.fillna(method='pad')
-        st.subheader("NasDaq Data from 2020, visualizing the close prices in the first year of Covid-19")
-        left_col_2, right_col_2 = st.columns(2)
-        with left_col_2:
-            st.write(df_nas_2)
-        #df_nas.plot(figsize=(10, 6), subplots=True)
-        with right_col_2:
-            st.line_chart(df_nas_2)
-        return df_nas,df_nas_2
-    # def get_data(self, dates):
-    #     indices = ['djia_2012', 'nasdaq_all']
-    #     df = pd.DataFrame(index=dates)
-    #     df_temp = pd.read_csv('../stock_data/nasdaq_all.csv', index_col='Date', parse_dates=True, usecols=['Date', 'Close'], na_values=['nan'])
-    #     df = df.join(df_temp)
-    #     return df
     
-    def fill_missing_vals(self, df):
-        df = df.interpolate(method='linear')
+    def fill_missing_vals(self):
+        self.df = self.df.fillna(method='ffill')
         scaler = MinMaxScaler(feature_range=(-1, 1))
         self.df['Close'] = scaler.fit_transform(self.df['Close'].values.reshape(-1,1))
         return scaler
@@ -143,44 +106,6 @@ class LSTM_sim():
         y_test = data[train_set_size:,-1,:]
         
         return [x_train, y_train, x_test, y_test]
-    def load_data_c_train(self, stock, look_back):
-        data_raw = stock.values # convert to numpy array
-        data = []
-        
-        # create all possible sequences of length look_back
-        for index in range(len(data_raw) - look_back): 
-            data.append(data_raw[index: index + look_back])
-        
-        data = np.array(data);
-        test_set_size = 0;
-        train_set_size = data.shape[0] - (test_set_size);
-        
-        x_train = data[:train_set_size,:-1,:]
-        y_train = data[:train_set_size,-1,:]
-        
-        x_test = data[train_set_size:,:-1]
-        y_test = data[train_set_size:,-1,:]
-        
-        return [x_train, y_train, x_test, y_test]
-    def load_data_c_test(self, stock, look_back):
-        data_raw = stock.values # convert to numpy array
-        data = []
-        
-        # create all possible sequences of length look_back
-        for index in range(len(data_raw) - look_back): 
-            data.append(data_raw[index: index + look_back])
-        
-        data = np.array(data);
-        test_set_size = data.shape[0];
-        train_set_size = 0;
-        
-        x_train = data[:train_set_size,:-1,:]
-        y_train = data[:train_set_size,-1,:]
-        
-        x_test = data[train_set_size:,:-1]
-        y_test = data[train_set_size:,-1,:]
-        
-        return [x_train, y_train, x_test, y_test]
     
     
     def create_train_test_sets(self):
@@ -192,17 +117,7 @@ class LSTM_sim():
         y_test = torch.from_numpy(y_test).type(torch.Tensor)
 
         return [x_train, y_train, x_test, y_test]
-
-    def create_train_test_sets_c(self, df1, df2):
-        look_back = 40 # choose sequence length
-        x_train_1, y_train_1, x_test_1, y_test_1 = self.load_data_c_train(df1, look_back)
-        x_train_2, y_train_2, x_test_2, y_test_2 = self.load_data_c_test(df2, look_back)
-        x_train_1 = torch.from_numpy(x_train_1).type(torch.Tensor)
-        y_train_1 = torch.from_numpy(y_train_1).type(torch.Tensor)
-        x_test_2 = torch.from_numpy(x_test_2).type(torch.Tensor)
-        y_test_2 = torch.from_numpy(y_test_2).type(torch.Tensor)
-
-        return [x_train_1, y_train_1, x_test_2, y_test_2]
+    
     def model_run(self, scaler):
         input_dim = 1
         hidden_dim = 32
@@ -228,22 +143,6 @@ class LSTM_sim():
         y_train =vals[1]
         x_test = vals[2]
         y_test = vals[3]
-
-        #Testing baseline here
-        model_bl = LSTM(input_dim=input_dim, hidden_dim=hidden_dim, output_dim=output_dim, num_layers=num_layers)
-        st.subheader('Looking at the baseline')
-        #baseline_mean = forward_chaining_CV(x_train, y_train, 10, model_bl,scaler)
-        
-        df_cv = [['Num folds','RMSE'],[2,0.004256599582731724],[3,0.00088069261983037],[4,0.0009792959317564964],[5,0.0007891964633017778],[6,0.0006125025684013963],[7,0.0004966917331330478],[8,0.0004152775218244642],[9,0.00039222268969751894],[10,0.00041217394755221903]]
-        for x in df_cv:
-            st.write(x[0], '            ',x[1])
-
-        baseline_mean = 0.00102607
-        st.subheader('Baseline Average RMSE: %.8f ' % (baseline_mean))
-        #baseline = df_cv["RMSE"]
-        #st.subheader('Baseline Average RMSE: %.8f ' % np.mean(baseline))
-
-
         num_epochs = 100
         hist = np.zeros(num_epochs)
 
@@ -300,32 +199,6 @@ class LSTM_sim():
         testScore = math.sqrt(mean_squared_error(y_test[:,0], y_test_pred[:,0]))
         st.subheader('Test Score: %.2f RMSE' % (testScore))
 
-        #st.subheader("Predicting Covid: Visualize our Predicted Stock Close Price v.s. Real Stock Close Price around Covid")
-        #df1c,df2c = self.get_data_covid()
-        #df1 = df1c.dropna()
-        #df2 = df2c.dropna()
-        #x_train_covid, y_train_covid, x_test_covid, y_test_covid = self.create_train_test_sets_c(df1, df2)
-        # st.write(x_train_covid, y_train_covid, x_test_covid,y_test_covid)
-        #c_loss, covid_error, y_covid_pred,y_test_covid = train_and_test(x_train_covid,y_train_covid,x_test_covid,y_test_covid,model,scaler)
-        #st.subheader('Test Score: %.2f RMSE' % (covid_error))
-        # visualize results
-        #st.subheader("Final Results: Visualize our Predicted Stock Close Price v.s. Real Stock Close Price for Covid")
-        #figure_c, axes_c = plt.subplots(figsize=(20, 15))
-        #axes_c.xaxis_date()
-
-        #axes_c.plot(df2[len(df2)-len(y_test_covid):].index, y_test_covid, color = 'red', label = 'Real NasDaq Stock Price')
-        #axes_c.plot(df2[len(df2)-len(y_test_covid):].index, y_covid_pred, color = 'blue', label = 'Predicted NasDaq Stock Price')
-        #axes.xticks(np.arange(0,394,50))
-        #plt.title('NasDaq Stock Price Prediction for First Year of Covid')
-        #plt.xlabel('Time')
-        #plt.ylabel('NasDaq Stock Price')
-        #plt.legend()
-        #plt.savefig('NasDaq_pred.png')
-        #st.pyplot(figure_c)
-
-
-
-
         # visualize results
         st.subheader("Final Results: Visualize our Predicted Stock Close Price v.s. Real Stock Close Price")
         figure, axes = plt.subplots(figsize=(10, 10))
@@ -338,5 +211,4 @@ class LSTM_sim():
         plt.xlabel('Time')
         plt.ylabel('NasDaq Stock Price')
         plt.legend()
-        plt.savefig('NasDaq_pred.png')
         st.pyplot(figure)
