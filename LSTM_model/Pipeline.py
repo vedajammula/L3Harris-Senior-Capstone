@@ -26,13 +26,13 @@ class Pipeline():
         #preprocessing steps
 
         ###TEMP DATA INITIALIZIATION FOR MODEL
-        dates = pd.date_range('2010-01-04','2017-01-03',freq='B')
+        """ dates = pd.date_range('2010-01-04','2017-01-03',freq='B')
         indices = ['djia_2012', 'nasdaq_all']
         df = pd.DataFrame(index=dates)
         df_temp = pd.read_csv('../stock_data/nasdaq_all.csv', index_col='Date', parse_dates=True, usecols=['Date', 'Close'], na_values=['nan'])
         df = df.join(df_temp)
         #df_nas.head()
-        df.fillna(method='pad')
+        df.fillna(method='pad') """
 
         win = Window(df, 45, 10)
         outliers = pd.DataFrame()
@@ -42,16 +42,15 @@ class Pipeline():
             temp = pd.DataFrame()
             window, judge = win.nextWindow()
             #run detection on judge with window as training data window
-            temp = temp.append(holes)
             hole = detect_hole(judge)
             holes = pd.concat([holes,hole])
             temp = pd.concat([temp,hole])
-            
 
             LOF = get_LOF(45, window, judge)  #LOF is now numpy list of numerical indices of outliers
             LOF = judge.iloc[LOF]
             outliers = pd.concat([outliers,LOF])
             temp = pd.concat([temp,LOF])
+            
 
             color = get_hurst_diff(window, judge)
             Hursts.append(color)
@@ -63,11 +62,7 @@ class Pipeline():
             del temp
 
             #use df interpolate
-            first = judge.isnull().values.any()
             judge = pd.concat([window,judge]).interpolate(method='spline', order=3).tail(len(df. index))
-            second = judge.isnull().values.any()
-            if first == True and second == True:
-                print(judge)
 
             #returns modified dataframe cleaned to be resubmitted to the window
             #run fill missing value on cleaned df variable
