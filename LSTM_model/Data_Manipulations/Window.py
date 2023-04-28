@@ -22,8 +22,7 @@ class Window():
         return (win, judge)
 
     def accepted(self, dataframe):
-        cols = list(self.df.columns) 
-        self.df.loc[self.df.date.isin(dataframe.date), cols] = dataframe[cols].values
+        self.df.update(dataframe)
 
     def cleaned(self):
         return self.df

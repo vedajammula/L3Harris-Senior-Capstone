@@ -7,7 +7,7 @@ from Data_Manipulations.LOF import get_LOF
 from Data_Manipulations.Hurst import get_hurst_diff
 from Data_Manipulations import KNN_unsupervised
 from Data_Manipulations.Hole_Detection import detect_hole
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import math
 
 
@@ -44,29 +44,34 @@ class Pipeline():
             #run detection on judge with window as training data window
             temp = temp.append(holes)
             hole = detect_hole(judge)
-            holes = holes.append(hole)
-            temp = temp.append(hole)
+            holes = pd.concat([holes,hole])
+            temp = pd.concat([temp,hole])
+            
 
-            LOF = get_LOF(45, window, judge)
-            LOF = np.add(LOF, judge.first_valid_index) #LOF is now numpy list of indices of outliers
-            outliers = outliers.append(LOF)
-            temp = temp.append(judgement.iloc[LOF])
+            LOF = get_LOF(45, window, judge)  #LOF is now numpy list of numerical indices of outliers
+            LOF = judge.iloc[LOF]
+            outliers = pd.concat([outliers,LOF])
+            temp = pd.concat([temp,LOF])
 
-            color = get_hurst_diff(window, judgement)
+            color = get_hurst_diff(window, judge)
             Hursts.append(color)
 
             #get temp indices and change df to nan
             #use interpolate
             indices = temp.index.tolist()
-            judgement.loc[indices, 'Close'] = np.nan
+            judge.loc[indices, 'Close'] = np.nan
             del temp
 
             #use df interpolate
-            judgement = judgement.interpolate(method='linear')
+            first = judge.isnull().values.any()
+            judge = pd.concat([window,judge]).interpolate(method='spline', order=3).tail(len(df. index))
+            second = judge.isnull().values.any()
+            if first == True and second == True:
+                print(judge)
 
             #returns modified dataframe cleaned to be resubmitted to the window
             #run fill missing value on cleaned df variable
-            win.accepted(judgement)
+            win.accepted(judge)
     
         st.set_page_config(page_title='L3Harris Senior Capstone', page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
 

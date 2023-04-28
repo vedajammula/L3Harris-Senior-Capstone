@@ -10,5 +10,5 @@ def detect_hole(df):
     dataf = pd.DataFrame({'Dates':df.Dates,'diff':df.Dates-df.Dates.shift(1)})
     dataf["Is Weekday"] = dataf['Dates'].dt.dayofweek <= 4
     temp = pd.DataFrame()
-    temp['Dates'] = dataf.loc[(dataf['Is Weekday'] == False) | (((dataf['diff'] >= timedelta(days=2)) & (dataf['Dates'].dt.dayofweek != 0))), 'Dates']
+    temp['Date'] = dataf.loc[(dataf['Is Weekday'] == False) | (((dataf['diff'] >= timedelta(days=2)) & (dataf['Dates'].dt.dayofweek != 0))), 'Dates']
     return temp

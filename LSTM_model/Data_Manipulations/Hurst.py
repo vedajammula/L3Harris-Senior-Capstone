@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 
-def get_hurst_exponent(time_series, max_lag=45):
+def get_hurst_exponent(df, max_lag=45):
+    time_series = df['Close'].to_numpy()
+
     lags = range(2, max_lag)
 
     # variances of the lagged differences
@@ -12,10 +14,15 @@ def get_hurst_exponent(time_series, max_lag=45):
 
     return reg[0]
 
+
+
+
+
 def get_hurst_diff(window, judgement):
-    combined = window.append(judgement)
+    combined = pd.concat([window,judgement])
 
     diff = get_hurst_exponent(window) - get_hurst_exponent(combined)
+ 
 
     if diff >= 0.8:
         return "red"
