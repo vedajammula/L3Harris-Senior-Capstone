@@ -88,15 +88,17 @@ class Pipeline():
         ax.set_ylabel('Prices')
         graphing_dates = list(df.index)
         print(graphing_dates[0])
-        p = ax.scatter(df.index,df["Close"], zorder=4)
+        ax.scatter(df.index,df["Close"], zorder=4)
         ax.axvspan(graphing_dates[0], graphing_dates[44], alpha=0.3,color='green',zorder=3)
         date_sliced = graphing_dates[44:]
+        print(date_sliced[0])
+        print(date_sliced[-1])
         for i in range(len(date_sliced)):
             endDate = i+10 if i+10<len(date_sliced) else len(date_sliced)-1
             ax.axvspan(date_sliced[i], endDate, alpha=0.3,color=Hursts[math.floor(i/10)],zorder=3)
             i = endDate
         st.sidebar.pyplot(fig)
-        fig.colorbar(p)
+
         print(Hursts)
 
 
