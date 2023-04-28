@@ -62,7 +62,7 @@ class Pipeline():
             del temp
 
             #use df interpolate
-            judge = pd.concat([window,judge]).interpolate(method='spline', order=3).tail(len(df. index))
+            judge = pd.concat([window,judge]).interpolate(method='linear', order=2).tail(len(df. index))
 
             #returns modified dataframe cleaned to be resubmitted to the window
             #run fill missing value on cleaned df variable
@@ -91,11 +91,9 @@ class Pipeline():
         ax.scatter(df.index,df["Close"], zorder=4)
         ax.axvspan(graphing_dates[0], graphing_dates[44], alpha=0.3,color='green',zorder=3)
         date_sliced = graphing_dates[44:]
-        print(date_sliced[0])
-        print(date_sliced[-1])
         for i in range(len(date_sliced)):
             endDate = i+10 if i+10<len(date_sliced) else len(date_sliced)-1
-            ax.axvspan(date_sliced[i], endDate, alpha=0.3,color=Hursts[math.floor(i/10)],zorder=3)
+            ax.axvspan(date_sliced[i], date_sliced[endDate], alpha=0.2,color=Hursts[math.floor(i/10)],zorder=3)
             i = endDate
         st.sidebar.pyplot(fig)
 
