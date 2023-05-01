@@ -5,7 +5,7 @@ import random
 import pandas as pd 
 import matplotlib.pyplot as plt
 
-from pandas import datetime
+#rom pandas import datetime
 import math, time
 import itertools
 import datetime

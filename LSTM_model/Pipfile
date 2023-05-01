@@ -4,6 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+
+[dev-packages]
 numpy = "*"
 pandas = "*"
 streamlit = "*"
@@ -14,8 +16,5 @@ torchvision = "*"
 seaborn = "*"
 scikit-learn-extra = "*"
 
-[dev-packages]
-
 [requires]
 python_version = "3.9"
-python_full_version = "3.9.6"
