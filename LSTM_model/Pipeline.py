@@ -18,7 +18,7 @@ class Pipeline():
         filename = 'nasdaq_all.csv'
         start_date = '2010-01-04'
         end_date = '2017-01-03'
-        df_temp = pd.read_csv('stock_data/'+filename, usecols=['Date', 'Close'], na_values=['nan'])
+        df_temp = pd.read_csv('../stock_data/'+filename, usecols=['Date', 'Close'], na_values=['nan'])
         df_temp['Date'] = pd.to_datetime(df_temp['Date'])
         df = df_temp[(df_temp['Date'] >= start_date) & (df_temp['Date'] <= end_date)]
         df.set_index('Date', inplace=True)
