@@ -13,14 +13,16 @@ import math
 
 
 class Pipeline():
+    def __init__(self, filename, start_date, end_date):
+        self.filename = filename
+        self.start_date = start_date
+        self.end_date = end_date
+
 
     def run_pipeline(self):
-        filename = 'nasdaq_all.csv'
-        start_date = '2010-01-04'
-        end_date = '2017-01-03'
-        df_temp = pd.read_csv('../stock_data/'+filename, usecols=['Date', 'Close'], na_values=['nan'])
+        df_temp = pd.read_csv('../stock_data/'+self.filename, usecols=['Date', 'Close'], na_values=['nan'])
         df_temp['Date'] = pd.to_datetime(df_temp['Date'])
-        df = df_temp[(df_temp['Date'] >= start_date) & (df_temp['Date'] <= end_date)]
+        df = df_temp[(df_temp['Date'] >= self.start_date) & (df_temp['Date'] <= self.end_date)]
         df.set_index('Date', inplace=True)
 
         #preprocessing steps
@@ -68,14 +70,14 @@ class Pipeline():
             #run fill missing value on cleaned df variable
             win.accepted(judge)
     
-        st.set_page_config(page_title='L3Harris Senior Capstone', page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
+        #st.set_page_config(page_title='L3Harris Senior Capstone', page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
 
         st.sidebar.title("Data Manipulations")
 
         st.sidebar.header("K-Nearest Neighbors")
         
 
-        k = KNN_unsupervised.KNN_unsupervised(filename, start_date, end_date)
+        k = KNN_unsupervised.KNN_unsupervised(self.filename, self.start_date, self.end_date)
         manipulated_data = k.run_KNN()
         print(manipulated_data)
 
@@ -117,7 +119,7 @@ class Pipeline():
         #data manipulation steps
 
         #LSTM Model
-        model_sim = LSTM_sim(manipulated_data)
+        model_sim = LSTM_sim(manipulated_data, self.filename, self.start_date, self.end_date)
         model_sim.simulation()
 
         #Model validity checks??
@@ -126,6 +128,9 @@ class Pipeline():
 
 
 ###### RUN THE PIPELINE
+# filename = 'nasdaq_all.csv'
+# start_date = '2010-01-04'
+# end_date = '2017-01-03'
 
-pipeline = Pipeline()
-pipeline.run_pipeline()
+# pipeline = Pipeline(filename, start_date, end_date)
+# pipeline.run_pipeline()

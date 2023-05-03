@@ -55,11 +55,14 @@ class LSTM(nn.Module):
 
 class LSTM_sim():
 
-    def __init__(self, df):
+    def __init__(self, df, filename, start_date, end_date):
         self.df = df
+        self.filename = filename
+        self.start_date = start_date
+        self.end_date = end_date
 
     def simulation(self):
-        st.title("L3 Harris Senior Capstone - Data Input Manipulation of LSTM Model")
+        st.title("LSTM Model Run")
 
         self.get_data_timeseries()
         scaler = self.fill_missing_vals()
@@ -72,7 +75,7 @@ class LSTM_sim():
         # #df_nas.head()
         # df_nas.fillna(method='pad')
 
-        st.subheader("NasDaq Data from 2010-2017, visualizing the close prices")
+        st.subheader(self.filename+" Data from " + self.start_date + " to " + self.end_date + ", visualizing the close prices")
         left_col, right_col = st.columns(2)
         with left_col:
             st.write(self.df)
@@ -204,10 +207,10 @@ class LSTM_sim():
         figure, axes = plt.subplots(figsize=(10, 10))
         axes.xaxis_date()
 
-        axes.plot(self.df[len(self.df)-len(y_test):].index, y_test, color = 'red', label = 'Real NasDaq Stock Price')
-        axes.plot(self.df[len(self.df)-len(y_test):].index, y_test_pred, color = 'blue', label = 'Predicted NasDaq Stock Price')
+        axes.plot(self.df[len(self.df)-len(y_test):].index, y_test, color = 'red', label = 'Real '+ self.filename + ' Stock Price')
+        axes.plot(self.df[len(self.df)-len(y_test):].index, y_test_pred, color = 'blue', label = 'Predicted ' + self.filename + ' NasDaq Stock Price')
         #axes.xticks(np.arange(0,394,50))
-        plt.title('NasDaq Stock Price Prediction')
+        plt.title(self.filename + ' Stock Price Prediction')
         plt.xlabel('Time')
         plt.ylabel('NasDaq Stock Price')
         plt.legend()
