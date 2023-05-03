@@ -17,7 +17,9 @@ Project Structure:
       12) wrong_data.py
 
 
-Working with PipEnv:
+Working with PipEnv: 
+
+IMPORTANT!!!: make sure pipenv is installed and up to date in your computer system, you can do this in one comamand which will either install/update pipenv or tell you that you have the most up to date version. Type: "pip3 install pipenv"
 
 - First once you have git cloned the repo, cd into L3Harris-Senior-Capstone/
 - This project is set to run in python 3.9.6 but pipenv should automatically detect this from the Pipfile
