@@ -208,10 +208,10 @@ class LSTM_sim():
         axes.xaxis_date()
 
         axes.plot(self.df[len(self.df)-len(y_test):].index, y_test, color = 'red', label = 'Real '+ self.filename + ' Stock Price')
-        axes.plot(self.df[len(self.df)-len(y_test):].index, y_test_pred, color = 'blue', label = 'Predicted ' + self.filename + ' NasDaq Stock Price')
+        axes.plot(self.df[len(self.df)-len(y_test):].index, y_test_pred, color = 'blue', label = 'Predicted ' + self.filename + ' Stock Price')
         #axes.xticks(np.arange(0,394,50))
         plt.title(self.filename + ' Stock Price Prediction')
         plt.xlabel('Time')
-        plt.ylabel('NasDaq Stock Price')
+        plt.ylabel('Stock Price')
         plt.legend()
         st.pyplot(figure)
