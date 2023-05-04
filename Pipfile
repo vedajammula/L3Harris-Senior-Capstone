@@ -13,8 +13,8 @@ scikit-learn = "*"
 scikit-learn-extra = "*"
 seaborn = "*"
 torchvision = "*"
+urllib3 = "==1.2.2"
 
 [dev-packages]
 
 [requires]
-python_version = ">=3.6"
