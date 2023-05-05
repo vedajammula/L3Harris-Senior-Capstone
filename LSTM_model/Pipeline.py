@@ -15,10 +15,10 @@ import math
 class Pipeline():
 
     def run_pipeline(self):
-        filename = 'nasdaq_all.csv'
+        filename = 'new_djdatafinal.csv'
         start_date = '2010-01-04'
         end_date = '2017-01-03'
-        df_temp = pd.read_csv('stock_data/'+filename, usecols=['Date', 'Close'], na_values=['nan'])
+        df_temp = pd.read_csv('../stock_data/'+filename, usecols=['Date', 'Close'], na_values=['nan'])
         df_temp['Date'] = pd.to_datetime(df_temp['Date'])
         df = df_temp[(df_temp['Date'] >= start_date) & (df_temp['Date'] <= end_date)]
         df.set_index('Date', inplace=True)
@@ -33,8 +33,19 @@ class Pipeline():
         df = df.join(df_temp)
         #df_nas.head()
         df.fillna(method='pad') """
+    
+        st.set_page_config(page_title='L3Harris Senior Capstone', page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
 
-        win = Window(df, 45, 10)
+        st.sidebar.title("Data Manipulations")
+
+        st.sidebar.header("K-Nearest Neighbors")
+        
+
+        k = KNN_unsupervised.KNN_unsupervised(filename, start_date, end_date)
+        manipulated_data = k.run_KNN()
+        print(manipulated_data)
+
+        win = Window(manipulated_data, 45, 10)
         outliers = pd.DataFrame()
         holes = pd.DataFrame()
         Hursts = []
@@ -67,21 +78,12 @@ class Pipeline():
             #returns modified dataframe cleaned to be resubmitted to the window
             #run fill missing value on cleaned df variable
             win.accepted(judge)
-    
-        st.set_page_config(page_title='L3Harris Senior Capstone', page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
 
-        st.sidebar.title("Data Manipulations")
-
-        st.sidebar.header("K-Nearest Neighbors")
-        
-
-        k = KNN_unsupervised.KNN_unsupervised(filename, start_date, end_date)
-        manipulated_data = k.run_KNN()
-        print(manipulated_data)
+        cleaned = win.cleaned()
 
 
         st.sidebar.header("Hurst Exponent")
-        fig = plt.figure(figsize=(20,15))
+        fig = plt.figure(figsize=(50,15))
         ax = fig.add_subplot(111)
         ax.set_title('Hurst-based Trend Analysis')
         ax.set_xlabel('Time')
@@ -117,7 +119,7 @@ class Pipeline():
         #data manipulation steps
 
         #LSTM Model
-        model_sim = LSTM_sim(manipulated_data)
+        model_sim = LSTM_sim(cleaned)
         model_sim.simulation()
 
         #Model validity checks??

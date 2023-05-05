@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-def get_hurst_exponent(df, max_lag=45):
+def get_hurst_exponent(df, max_lag=20):
     time_series = df['Close'].to_numpy()
 
     lags = range(2, max_lag)
@@ -24,9 +24,9 @@ def get_hurst_diff(window, judgement):
     diff = get_hurst_exponent(window) - get_hurst_exponent(combined)
  
 
-    if diff >= 0.8:
+    if diff >= 0.5:
         return "red"
-    elif diff >= 0.2:
+    elif diff >= 0.005:
         return "yellow"
     else:
         return "green"

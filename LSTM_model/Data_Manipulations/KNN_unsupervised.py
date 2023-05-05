@@ -18,7 +18,7 @@ class KNN_unsupervised():
     
     def process_data(self):
         #read csv file and set the dates to what we want 
-        df_temp = pd.read_csv('stock_data/'+self.filename, usecols=['Date', 'Close'], na_values=['nan'])
+        df_temp = pd.read_csv('../stock_data/'+self.filename, usecols=['Date', 'Close'], na_values=['nan'])
         df_temp['Date'] = pd.to_datetime(df_temp['Date'])
 
         df = df_temp[(df_temp['Date'] >= self.start_date) & (df_temp['Date'] <= self.end_date)]
