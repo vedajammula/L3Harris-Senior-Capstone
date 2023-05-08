@@ -1,30 +1,61 @@
-So this folder of the project is where I have implemented a pipeline structure and converted the LSTM Model simulation into a class.
-The flow structure in terms of development should be as follows:
+Project Structure: 
+- root directory: stock_data, LSTM_model, readme, Pipfile, Pipfile.lock (both pipfiles are used to install the project dependencies)
+  - stock_data: CSVs of data for NASDAQ, Russell 2000, S&P 500 AND the CSVs with "new" in front of the file represent the simulated adversarial attacks
+  - LSTM_model: the root of this folder contains: Data_Manipulations module, LSTM_sim.py which is the LSTM stock close price predicition model,                 Pipeline.py, pages folder, home.py
+    - So basically home.py is run with streamlit and acts as the main page for the dashboard, and then the pages folder contains 3 files for NASDAQ, DJIA,       and RUSSELL. In each page file Pipeline.py is called passing in the stock index csv, start date, and end date. 
+    - Data Manipulations Module:
+      1) Cross_Validate.py 
+      2) Generate_Time_Intervals.py
+      3) Hole_Detection.py
+      4) Hurst.py
+      5) KNN_unsupervised.py
+      6) LOF.py
+      7) Random_Data.py
+      8) Time_Intervals.py
+      9) Window.py
+      10) Window_parse.py
+      11) __init__.py
+      12) wrong_data.py
 
-1. no more jupyter notebooks! when we are coding all files should be python class files
-2. files where we are working on the data manipulation should go into the folder called Data manipulations
-3. We will then import the manipulation files into the Pipeline.py file which is located in the /LSTM_model folder
-4. Now, in the run_pipeline() function in Pipeline.py, you can instantiate your manipulation class and then call the manipulation function
 
-- The manipulation functions should in most cases take a pandas dataframe in, and return a pandas data frame which we can then pass into the LSTM_model simulation
-- We will need to edit the LSTM_model_simulation to take a data frame in, but that is easy and can be done once all manipulations are complete
+Working with PipEnv: 
 
-5. If we follow this structure we should be all good
+IMPORTANT!!!: 
+- make sure pipenv is installed and up to date in your computer system, you can do this in one comamand which will either install/update pipenv or tell you   that you have the most up to date version. Type: "pip3 install pipenv" or "pip install pipenv"
+- this project will not run if you your current python version is less than 3.5, however for the best results I suggest using python 3.6 or higher (we have tested with python 3.9 and 3.11 and it works)
+  - this is because pipenv requires python 3.5 or later to function properly and if you have python 2 this will not be supported at all
+- whatever python version 3.6+ you choose to use, make sure that it is actually installed and on your path OR you can use an interpreter in VScode that       3.6+
+- Additionally, no other pipenv or virtualenvs can be running, this will lead to pipenv install errors to check this just type "pipenv --rm" which will       either remove any pip or virtual envs that are open OR it will tell you there is nothing open to remove
+- So requirements to actually run this project: 
+  1) have python 3.6 or later versions installed and in your path OR in an interpreter with VScode (check this with the command: "python --version")
+  2) have pipenv installed and up to date which can be done with either "pip3 install pipenv" OR "pip install pipenv"
+  3) make sure there are no running pip or virtual envs with the command "pipenv --rm"
+  4) if all else fails and none of these steps work, you can manually "pip install {packagename}" for each package listed in Pipfile (there are not that        many)
 
-How to run the UI model:
 
-- Everything is contained in a pipenv so we should not need to locally install dependencies
-- If you need to install a dependency follow this format: pipenv install "packagename"
-  - Pip env needs to be running already before you install the dependency
-  - this will automatically add the dependency to the pipfile and thus to the pipenv so everyone will have it (rememberto push so the pipfile gets updated)
-  - please do not manually add a dependency to the pipfile because that might mess up the depdenencies for your own system and possibly others
-- To actually run the code we can do this in two steps:
-  - First when you are cd'd into the /LSTM_model folder, type: pipenv shell
-  - Second you might need to install the dependencies from the pipfile.lock so type: pipenv install --dev
-  - Third, to see UI in localhost type: streamlit run Pipeline.py
+TO RUN THE PROJECT WITH PIPENV: 
 
-Streamlit docs: https://docs.streamlit.io/library/api-reference
+- First once you have git cloned the repo, cd into L3Harris-Senior-Capstone/
+- To set up pipenv type: "pipenv install"
+  - This will install all dependencies from the pipfile lock
+- To activate the pip environment type: "pipenv shell"
+  - This will open a pipenv bash in your current terminal
+- Now all dependecies should be installed and you can check this by running: "pipenv run pip freeze", make sure streamlit is listed
+- Finally we can run the pipeline on datasets and see results in the UI dashboard so first cd into LSTM_model and then type: "streamlit run Home.py"
+- If you need to add dependencies to the project type: "pipenv install 'packagenanme'"
+- Similarly if you need to uninstall dependencies in the project type: "pipenv uninstall 'packagenanme'"
+  - If you add or delete a dependency make sure to commit and push the pipfile and pipfile lock
+- IMPORTANT!!!: When you are done running pipenv make sure to close it with: "exit"
+  - If you do not close your pipenv then there will be environment issues when you try to re-run the pipenv install
+- LASTLY: everytime you want to run dashboard you have to follow the steps above which are: 
+  1) cd L3Harris-Senior-Capstone/ 
+  2) pipenv install 
+  3) pipenv shell
+  4) cd LSTM_model
+  5) streamlit run Home.py
+  
+  
+- By Sarthak Shukla (let me know if you need any help running)
 
-- how to do different types of texts in streamlit: https://docs.streamlit.io/library/api-reference/text
-- how to display data (df's): https://docs.streamlit.io/library/api-reference/data
-- how to display graphs (streamlit graphs, matplotlib graphs): https://docs.streamlit.io/library/api-reference/charts
+
+

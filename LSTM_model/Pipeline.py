@@ -19,6 +19,7 @@ class Pipeline():
         start_date = '2010-01-04'
         end_date = '2017-01-03'
         df_temp = pd.read_csv('../stock_data/'+filename, usecols=['Date', 'Close'], na_values=['nan'])
+        df_temp = pd.read_csv('../stock_data/'+self.filename, usecols=['Date', 'Close'], na_values=['nan'])
         df_temp['Date'] = pd.to_datetime(df_temp['Date'])
         df = df_temp[(df_temp['Date'] >= start_date) & (df_temp['Date'] <= end_date)]
         df.set_index('Date', inplace=True)
@@ -81,6 +82,18 @@ class Pipeline():
 
         cleaned = win.cleaned()
 
+    
+        #st.set_page_config(page_title='L3Harris Senior Capstone', page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
+
+        st.sidebar.title("Data Manipulations")
+
+        st.sidebar.header("K-Nearest Neighbors")
+        
+
+        k = KNN_unsupervised.KNN_unsupervised(self.filename, self.start_date, self.end_date)
+        manipulated_data = k.run_KNN()
+        print(manipulated_data)
+
 
         st.sidebar.header("Hurst Exponent")
         fig = plt.figure(figsize=(50,15))
@@ -120,6 +133,7 @@ class Pipeline():
 
         #LSTM Model
         model_sim = LSTM_sim(cleaned)
+        model_sim = LSTM_sim(manipulated_data, self.filename, self.start_date, self.end_date)
         model_sim.simulation()
 
         #Model validity checks??
