@@ -4,7 +4,7 @@ from Pipeline import Pipeline
 st.set_page_config(page_title="NASDAQ", page_icon="📈")
 
 st.markdown("# NASDAQ")
-tab1, tab2 = st.tabs(["Real NASAQ Data", "Manipulated NASDAQ Data"])
+tab1, tab2, tab3 = st.tabs(["Real NASAQ Data", "Simulated Attack NASAQ Without Cleaning","Simulated Attack NASAQ With Cleaning"])
 
 filename = 'nasdaq_all.csv'
 start_date = '2010-01-04'
@@ -17,9 +17,11 @@ with tab1:
     pipeline.run_pipeline()
 
 filename = 'new_nasdaq.csv'
-data_flag = 1
 pipeline = Pipeline(filename, start_date, end_date, data_flag)
 
-
 with tab2:
+    pipeline.run_pipeline()
+
+data_flag = 1
+with tab3:
     pipeline.run_pipeline()

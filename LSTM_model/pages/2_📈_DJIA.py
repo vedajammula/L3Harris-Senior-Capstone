@@ -4,7 +4,7 @@ from Pipeline import Pipeline
 st.set_page_config(page_title="DJIA", page_icon="📈")
 
 st.markdown("# DJIA")
-tab1, tab2 = st.tabs(["Real DJIA Data", "Manipulated DJIA Data"])
+tab1, tab2, tab3 = st.tabs(["Real DJIA Data", "Simulated Attack DJIA Without Cleaning","Simulated Attack DJIA With Cleaning"])
 
 filename = 'djia_2012.csv'
 start_date = '2013-01-03'
@@ -16,12 +16,15 @@ pipeline = Pipeline(filename, start_date, end_date, data_flag)
 with tab1:
     pipeline.run_pipeline()
 
-filename = 'new_djdata.csv'
-data_flag = 1
+filename = 'new_djdatafinal.csv'
 pipeline = Pipeline(filename, start_date, end_date, data_flag)
 
-
 with tab2:
+    pipeline.run_pipeline()
+
+data_flag = 1
+pipeline = Pipeline(filename, start_date, end_date, data_flag)
+with tab3:
     pipeline.run_pipeline()
 
 # st.write('IN PROGRESS')
