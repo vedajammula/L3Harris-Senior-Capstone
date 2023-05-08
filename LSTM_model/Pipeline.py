@@ -35,7 +35,7 @@ class Pipeline():
         #df_nas.head()
         df.fillna(method='pad') """
     
-        st.set_page_config(page_title='L3Harris Senior Capstone', page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
+        #st.set_page_config(page_title='L3Harris Senior Capstone', page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
 
         st.sidebar.title("Data Manipulations")
 
