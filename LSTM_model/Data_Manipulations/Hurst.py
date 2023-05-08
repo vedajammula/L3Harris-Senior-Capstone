@@ -24,7 +24,7 @@ def get_hurst_diff(window, judgement):
     diff = get_hurst_exponent(window) - get_hurst_exponent(combined)
  
 
-    if diff >= 0.5:
+    if diff >= 0.3:
         return "red"
     elif diff >= 0.005:
         return "yellow"
