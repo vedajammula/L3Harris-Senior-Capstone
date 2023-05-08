@@ -4,11 +4,22 @@ from Pipeline import Pipeline
 st.set_page_config(page_title="NASDAQ", page_icon="📈")
 
 st.markdown("# NASDAQ")
-st.sidebar.header("NASDAQ")
+tab1, tab2 = st.tabs(["Real NASAQ Data", "Manipulated NASDAQ Data"])
 
 filename = 'nasdaq_all.csv'
 start_date = '2010-01-04'
 end_date = '2017-01-03'
+data_flag = 0
 
-pipeline = Pipeline(filename, start_date, end_date)
-pipeline.run_pipeline()
+pipeline = Pipeline(filename, start_date, end_date, data_flag)
+
+with tab1:
+    pipeline.run_pipeline()
+
+filename = 'new_nasdaq.csv'
+data_flag = 1
+pipeline = Pipeline(filename, start_date, end_date, data_flag)
+
+
+with tab2:
+    pipeline.run_pipeline()

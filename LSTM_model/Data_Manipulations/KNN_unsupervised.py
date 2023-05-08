@@ -43,8 +43,8 @@ class KNN_unsupervised():
         #create anomaly scores from distances 
         anomaly_score = distances[:,knn-1]
 
-        st.sidebar.text('Running KNN on ' + self.filename + ' with k neighbors=' + str(knn) )
-        st.sidebar.text('Colormap of outliers in this dataset')
+        st.text('Running KNN on ' + self.filename + ' with k neighbors=' + str(knn) )
+        st.text('Colormap of outliers in this dataset')
 
         fig = plt.figure(figsize=(10,6))
         ax = fig.add_subplot(111)
@@ -54,7 +54,7 @@ class KNN_unsupervised():
         p = ax.scatter(graphing_dates ,list(delta.Close),c=anomaly_score,cmap='jet')
 
         fig.colorbar(p)
-        st.sidebar.pyplot(fig)
+        st.pyplot(fig)
 
 
         #calculate and append anomaly scores 
@@ -64,9 +64,8 @@ class KNN_unsupervised():
         #display largest anomaly scores 
         largest_anomalies = result.nlargest(5,'Anomaly_Score')
 
-        st.sidebar.text('Top 5 Largest Anomaly Scores of Data Entries')
-        with st.sidebar:
-            st.write(largest_anomalies)
+        st.text('Top 5 Largest Anomaly Scores of Data Entries')
+        st.write(largest_anomalies)
         
         #the threshold will be the lowest anomaly score values
         threshold = largest_anomalies['Anomaly_Score'].min()
@@ -82,7 +81,7 @@ class KNN_unsupervised():
         plt.title(self.filename + ' data visualization ' + 'outliers')
         plt.xlabel('Time')
         plt.ylabel('Close Price')
-        st.sidebar.pyplot(figure)
+        st.pyplot(figure)
 
         return df
 

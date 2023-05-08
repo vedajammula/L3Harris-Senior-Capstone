@@ -13,10 +13,11 @@ import math
 
 
 class Pipeline():
-    def __init__(self, filename, start_date, end_date):
+    def __init__(self, filename, start_date, end_date, data_flag):
         self.filename = filename
         self.start_date = start_date
         self.end_date = end_date
+        self.data_flag = data_flag
 
     def run_pipeline(self):
         df_temp = pd.read_csv('../stock_data/'+self.filename, usecols=['Date', 'Close'], na_values=['nan'])
@@ -35,11 +36,14 @@ class Pipeline():
         #df_nas.head()
         df.fillna(method='pad') """
     
-        #st.set_page_config(page_title='L3Harris Senior Capstone', page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
 
-        st.sidebar.title("Data Manipulations")
+        st.title("Data Manipulations")
 
-        st.sidebar.header("K-Nearest Neighbors")
+        if(self.data_flag == 0):
+            st.write('The following data manipulations are for visualization purposes and are not passed into the LSTM model because this is real, original stock data that we should not have to manipulate. However, we can gain insights from these visualizations such as certain historical events which resulted in an anamalous close price for a given stock index.')
+        else:
+            st.write('The follow data manipulations will identify vulnerabilities in the simulated attack stock index datasets. Once vulnerabilities are identified, they will be resolved and the new manipulated dataset will be run through the LSTM close price prediction model. It is essential to compare the results of data manipulation and LSTM prediction of this dataset to the original dataset which can be seen on other tab of this page.')
+        st.header("K-Nearest Neighbors")
         
 
         k = KNN_unsupervised.KNN_unsupervised(self.filename, self.start_date, self.end_date)
@@ -82,15 +86,7 @@ class Pipeline():
 
         manipulated_data = win.cleaned()
 
-    
-        #st.set_page_config(page_title='L3Harris Senior Capstone', page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
-
-        st.sidebar.title("Data Manipulations")
-
-        st.sidebar.header("K-Nearest Neighbors")
-
-
-        st.sidebar.header("Hurst Exponent")
+        st.header("Hurst Exponent")
         fig = plt.figure(figsize=(50,15))
         ax = fig.add_subplot(111)
         ax.set_title('Hurst-based Trend Analysis')
@@ -98,26 +94,30 @@ class Pipeline():
         ax.set_ylabel('Prices')
         graphing_dates = list(df.index)
         print(graphing_dates[0])
-        ax.scatter(self.df.index,self.df["Close"], zorder=4)
+        ax.scatter(df.index,df["Close"], zorder=4)
         ax.axvspan(graphing_dates[0], graphing_dates[44], alpha=0.3,color='green',zorder=3)
         date_sliced = graphing_dates[44:]
         for i in range(len(date_sliced)):
             endDate = i+10 if i+10<len(date_sliced) else len(date_sliced)-1
             ax.axvspan(date_sliced[i], date_sliced[endDate], alpha=0.2,color=Hursts[math.floor(i/10)],zorder=3)
             i = endDate
-        st.sidebar.pyplot(fig)
+        st.pyplot(fig)
 
         print(Hursts)
 
+        left_col, right_col = st.columns(2)
+        
+        with left_col:
+            st.header("Local Outlier Factor")
+            st.write("Outliers detected using LOF: ")
+            st.write(outliers)
+            print(outliers)
 
-        st.sidebar.header("Local Outlier Factor")
-        st.sidebar
-        st.sidebar.write(outliers)
-        print(outliers)
-
-        st.sidebar.header("Hole Detection")
-        st.sidebar.write(holes)
-        print(holes)
+        with right_col:
+            st.header("Hole Detection")
+            st.write("Holes detected: ")
+            st.write(holes)
+            print(holes)
     
 
         
@@ -127,7 +127,10 @@ class Pipeline():
         #data manipulation steps
 
         #LSTM Model
-        model_sim = LSTM_sim(manipulated_data, self.filename, self.start_date, self.end_date)
+        model_input_data = manipulated_data
+        if(self.data_flag == 0):
+            model_input_data = df
+        model_sim = LSTM_sim(model_input_data, self.filename, self.start_date, self.end_date)
         model_sim.simulation()
 
         #Model validity checks??
