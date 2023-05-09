@@ -23,5 +23,7 @@ with tab2:
     pipeline.run_pipeline()
 
 data_flag = 1
+
+pipeline = Pipeline(filename, start_date, end_date, data_flag)
 with tab3:
     pipeline.run_pipeline()

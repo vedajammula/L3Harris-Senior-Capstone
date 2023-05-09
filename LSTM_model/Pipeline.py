@@ -119,6 +119,31 @@ class Pipeline():
             st.write(holes)
             print(holes)
     
+    
+        if(self.data_flag == 1):
+            st.header("Anomalies Caught")
+            if self.filename == 'new_nasdaq.csv':
+                df_temp = pd.read_csv('../stock_data/nasdaq_all.csv', usecols=['Date', 'Close'], na_values=['nan'])
+            elif self.filename == 'new_djdatafinal.csv':
+                df_temp = pd.read_csv('../stock_data/djia_2012.csv', usecols=['Date', 'Close'], na_values=['nan'])
+            elif self.filename == 'new_russel.csv':
+                df_temp = pd.read_csv('../stock_data/russel2000_all.csv', usecols=['Date', 'Close'], na_values=['nan'])
+            df_temp['Date'] = pd.to_datetime(df_temp['Date'])
+            original = df_temp[(df_temp['Date'] >= self.start_date) & (df_temp['Date'] <= self.end_date)]
+            original.set_index('Date', inplace=True)
+            false_value_indices = original.compare(df).index.values.tolist()
+            found_value_indices = df.index.intersection(manipulated_data.index).values.tolist()
+            false_set = set(false_value_indices)
+            found_set = set(found_value_indices)
+            true_positive = len(false_set & found_set)
+            false_positive = len(found_set) - true_positive
+            false_negative = len(false_set) - true_positive
+            true_negative = len(graphing_dates) - false_negative - false_positive
+            
+            st.subheader("True Positives: "+str(true_positive))
+            st.subheader("False Negatives: "+str(false_negative))
+            st.subheader("False Positives: "+str(false_positive))
+            st.subheader("True Negatives: "+str(true_negative))
 
         
         
