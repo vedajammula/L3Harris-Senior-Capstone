@@ -138,7 +138,7 @@ class Pipeline():
             true_positive = len(false_set & found_set)
             false_positive = len(found_set) - true_positive
             false_negative = len(false_set) - true_positive
-            true_negative = len(graphing_dates) - false_negative - false_positive
+            true_negative = len(graphing_dates) - false_negative - false_positive - true_positive
             
             st.subheader("True Positives: "+str(true_positive))
             st.subheader("False Negatives: "+str(false_negative))
