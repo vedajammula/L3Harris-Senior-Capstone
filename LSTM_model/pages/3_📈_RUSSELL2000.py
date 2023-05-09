@@ -17,6 +17,7 @@ with tab1:
     pipeline.run_pipeline()
 
 filename = 'new_russel.csv'
+data_flag = 2
 pipeline = Pipeline(filename, start_date, end_date, data_flag)
 
 with tab2:
@@ -24,5 +25,6 @@ with tab2:
 
 data_flag = 1
 pipeline = Pipeline(filename, start_date, end_date, data_flag)
+
 with tab3:
     pipeline.run_pipeline()

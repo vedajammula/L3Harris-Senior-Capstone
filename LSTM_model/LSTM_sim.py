@@ -79,6 +79,7 @@ class LSTM_sim():
         left_col, right_col = st.columns(2)
         with left_col:
             st.write(self.df)
+            st.write('Number of data points we are analyzing: ', len(self.df['Close']))
         with right_col:
             print('cols', self.df.columns)
             st.line_chart(self.df)
