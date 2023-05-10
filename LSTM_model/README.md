@@ -26,6 +26,8 @@ IMPORTANT!!!:
   - this is because pipenv requires python 3.5 or later to function properly and if you have python 2 this will not be supported at all
 - whatever python version 3.6+ you choose to use, make sure that it is actually installed and on your path OR you can use an interpreter in VScode that       3.6+
 - Additionally, no other pipenv or virtualenvs can be running, this will lead to pipenv install errors to check this just type "pipenv --rm" which will       either remove any pip or virtual envs that are open OR it will tell you there is nothing open to remove
+- Streamlit library causes issues with python versions less than 3.10, therefore an additional dependency of URLLib3 is added to the Pipfile with             certain version to support python versions below 3.10
+- If you are running python 3.10 or higher the extra URLLib3 depdency will not install properly causing streamlit errors, therefore go into the Pipfile       and delete the line where URLLib3 is listed and re-run the pipenv install command and it should work
 - So requirements to actually run this project: 
   1) have python 3.6 or later versions installed and in your path OR in an interpreter with VScode (check this with the command: "python --version")
   2) have pipenv installed and up to date which can be done with either "pip3 install pipenv" OR "pip install pipenv"
