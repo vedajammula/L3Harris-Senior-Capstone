@@ -33,7 +33,7 @@ IMPORTANT!!!:
   2) have pipenv installed and up to date which can be done with either "pip3 install pipenv" OR "pip install pipenv"
   3) make sure there are no running pip or virtual envs with the command "pipenv --rm"
   4) if all else fails and none of these steps work, you can manually "pip install {packagename}" for each package listed in Pipfile (there are not that        many)
-
+pipenv
 
 TO RUN THE PROJECT WITH PIPENV: 
 
@@ -44,7 +44,7 @@ TO RUN THE PROJECT WITH PIPENV:
   - This will open a pipenv bash in your current terminal
 - Now all dependecies should be installed and you can check this by running: "pipenv run pip freeze", make sure streamlit is listed
 - Finally we can run the pipeline on datasets and see results in the UI dashboard so first cd into LSTM_model and then type: "streamlit run Home.py"
-  - If you get an AttributeError (i.e. AttributeError: module 'collections' has no attribute 'MutableMapping'), try deleting "urllib3 = "==1.2.2"" from the Pipfile and rerunning.
+  - If you get an AttributeError (e.g. AttributeError: module 'collections' has no attribute 'MutableMapping'), try deleting "urllib3 = "==1.2.2"" from the Pipfile and rerunning.
 - If you need to add dependencies to the project type: "pipenv install 'packagenanme'"
 - Similarly if you need to uninstall dependencies in the project type: "pipenv uninstall 'packagenanme'"
   - If you add or delete a dependency make sure to commit and push the pipfile and pipfile lock
